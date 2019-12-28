@@ -4,6 +4,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user_group")
@@ -24,6 +26,15 @@ public class UserGroup {
     @ManyToOne
     @JoinColumn(name="learningProcess_id", nullable=false)
     private LearningProcess learningProcess;
+
+    @JoinTable(
+            name = "rel_user_group_and_learning_student",
+            joinColumns = @JoinColumn(name = "FK_user_group", nullable = false),
+            inverseJoinColumns = @JoinColumn(name="FK_learning_student", nullable = false)
+    )
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<LearningStudent> learningStudentList;
+
 
     public UserGroup() {
 
@@ -52,6 +63,14 @@ public class UserGroup {
     public void setLearningProcess(LearningProcess learningProcess) {
         this.learningProcess = learningProcess;
     }
+
+    public void addLearningStudent(LearningStudent student){
+        if(this.learningStudentList == null){
+            this.learningStudentList = new ArrayList<>();
+        }
+        this.learningStudentList.add(student);
+    }
+
 
     @Override
     public String toString(){

@@ -82,8 +82,6 @@ public class LearningProcessController {
                     currentLearningProcess)
         );
 
-
-
         return currentLearningProcess;
     }
 
