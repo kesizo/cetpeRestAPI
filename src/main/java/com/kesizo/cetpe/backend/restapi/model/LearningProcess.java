@@ -79,10 +79,17 @@ public class LearningProcess {
     @JsonIgnore // https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
     private Set<AssessmentRubric> rubricSet;
 
+    @OneToMany(mappedBy = "learningProcess", cascade = CascadeType.ALL, orphanRemoval = true) // https://www.baeldung.com/delete-with-hibernate
+    @JsonIgnore // https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+    private Set<UserGroup> userGroupSet;
+
+    @OneToMany(mappedBy = "learningProcess", cascade = CascadeType.ALL)
+    @JsonIgnore // https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+    private Set<LearningSupervisor> learningSupervisorsSet;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
     private LearningProcessStatus status;
-
 
     public LearningProcess(long id, @Size(min = 3, max = 256) String name,
                            @Size(min = 1, max = 1024) String description,
@@ -268,6 +275,10 @@ public class LearningProcess {
     public LearningProcessStatus getStatus() { return status; }
 
     public void setStatus(LearningProcessStatus status) { this.status = status; }
+
+    public Set<UserGroup> getUserGroupSet() { return userGroupSet; }
+
+    public void setUserGroupSet(Set<UserGroup> userGroupSet) { this.userGroupSet = userGroupSet; }
 
     public Set<AssessmentRubric> getRubricSet() { return rubricSet; }
 
