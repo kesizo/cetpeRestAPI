@@ -1,6 +1,5 @@
 package com.kesizo.cetpe.backend.restapi.repository;
 
-import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.model.ItemRubric;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

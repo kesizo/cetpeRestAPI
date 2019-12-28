@@ -1,10 +1,8 @@
 package com.kesizo.cetpe.backend.restapi.repository;
 
-import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
+import com.kesizo.cetpe.backend.restapi.model.UserGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 
 /**
@@ -14,10 +12,9 @@ import java.util.List;
  * a Repository.
  */
 
-@Repository("assessmentRubricRepository")
-public interface AssessmentRubricRepository extends JpaRepository<AssessmentRubric, Long> {
+@Repository("userGroupRepository")
+public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
 
-    List<AssessmentRubric> findByLearningProcess_id(long learningProcess_id);
 }
 
 
