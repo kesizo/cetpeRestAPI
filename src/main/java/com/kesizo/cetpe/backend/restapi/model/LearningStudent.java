@@ -3,6 +3,7 @@ package com.kesizo.cetpe.backend.restapi.model;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "learning_student")
@@ -28,7 +29,9 @@ public class LearningStudent {
     @Column(name="last_name", nullable = false, length = 256)
     private String lastName;
 
-    @ManyToMany(mappedBy = "learning_student")
+    //https://www.baeldung.com/jpa-many-to-many
+    //the mappedBy must be the value of the attribute of the list from the other class
+    @ManyToMany(mappedBy = "learningStudentList")
     private List<UserGroup> userGroupList;
 
     public LearningStudent(){

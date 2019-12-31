@@ -27,12 +27,12 @@ public class UserGroup {
     @JoinColumn(name="learningProcess_id", nullable=false)
     private LearningProcess learningProcess;
 
+    @ManyToMany
     @JoinTable(
-            name = "rel_user_group_and_learning_student",
-            joinColumns = @JoinColumn(name = "FK_user_group", nullable = false),
-            inverseJoinColumns = @JoinColumn(name="FK_learning_student", nullable = false)
-    )
-    @ManyToMany(cascade = CascadeType.ALL)
+            name = "rel_userGroup_learningStudent",
+            joinColumns = @JoinColumn(name = "userGroup_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name="learningStudent_id", nullable = false)
+    ) //https://www.baeldung.com/jpa-many-to-many
     private List<LearningStudent> learningStudentList;
 
 
