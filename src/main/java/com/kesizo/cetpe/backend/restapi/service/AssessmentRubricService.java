@@ -15,6 +15,8 @@ public interface AssessmentRubricService {
 
     List<AssessmentRubric> getAllAssessmentRubrics();
 
+    List<AssessmentRubric> getAssessmentRubricsByLearningProcessId(long learningProcess_id);
+
     AssessmentRubric createAssessmentRubric(String title,
                                             LocalDateTime starting_date_time,
                                             LocalDateTime end_date_time,

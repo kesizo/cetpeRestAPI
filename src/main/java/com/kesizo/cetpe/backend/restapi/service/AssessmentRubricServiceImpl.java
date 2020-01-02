@@ -2,10 +2,10 @@ package com.kesizo.cetpe.backend.restapi.service;
 
 import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
-import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
+
 import com.kesizo.cetpe.backend.restapi.model.RubricType;
 import com.kesizo.cetpe.backend.restapi.repository.AssessmentRubricRepository;
-import com.kesizo.cetpe.backend.restapi.repository.LearningProcessRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +32,11 @@ public class AssessmentRubricServiceImpl implements AssessmentRubricService
     @Override
     public List<AssessmentRubric> getAllAssessmentRubrics() {
         return this._assessmentRubricRepository.findAll();
+    }
+
+    @Override
+    public List<AssessmentRubric> getAssessmentRubricsByLearningProcessId(long learningProcess_id) {
+        return this._assessmentRubricRepository.findByLearningProcess_id(learningProcess_id);
     }
 
     @Override
