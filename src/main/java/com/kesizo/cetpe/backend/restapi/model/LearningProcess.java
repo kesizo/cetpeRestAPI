@@ -25,7 +25,7 @@ public class LearningProcess {
     @Size(min = 3, max = 256) // it requires to have at least 3 characters
     private String name;
 
-    @Column(name = "description", nullable = false, length = 256)
+    @Column(name = "description", nullable = false, length = 1024)
     @Size(min = 1, max = 1024)
     private String description;
 

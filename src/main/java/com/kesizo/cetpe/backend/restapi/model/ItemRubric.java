@@ -18,10 +18,10 @@ public class ItemRubric {
             allocationSize=100)
     private long id;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, length =  2048) //Characters
     private String description;
 
-    //It indicates the rank of values of the current rubric items. From 1 to the value stored in the attribute
+
     @Column(name = "weight", nullable = false)
     @Min(1)
     private int weight;

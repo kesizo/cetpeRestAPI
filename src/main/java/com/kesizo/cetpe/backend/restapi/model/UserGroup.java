@@ -20,7 +20,7 @@ public class UserGroup {
     private long id;
 
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 256)
     private String name;
 
     @ManyToOne
@@ -34,6 +34,10 @@ public class UserGroup {
             inverseJoinColumns = @JoinColumn(name="learningStudent_id", nullable = false)
     ) //https://www.baeldung.com/jpa-many-to-many
     private List<LearningStudent> learningStudentList;
+
+    @ManyToOne
+    @JoinColumn(name="learningStudent_id", nullable=false)
+    private LearningStudent authorizedStudent;
 
 
     public UserGroup() {

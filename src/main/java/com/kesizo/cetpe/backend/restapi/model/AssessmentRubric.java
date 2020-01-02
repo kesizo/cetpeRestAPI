@@ -7,7 +7,9 @@ import org.json.JSONObject;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -22,7 +24,8 @@ public class AssessmentRubric {
             allocationSize=100)
     private long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false, length = 256)
+    @Size(min = 3, max = 256) // it requires to have at least 3 characters
     private String title;
 
     @Column(name = "starting_date_time", nullable = false, columnDefinition = "TIMESTAMP")
@@ -44,6 +47,11 @@ public class AssessmentRubric {
     @ManyToOne
     @JoinColumn(name="learningProcess_id", nullable=false)
     private LearningProcess learningProcess;
+
+    // This cascade and orphanRemoval means that all children rubrics will be removed when the learning process is removed
+    @OneToMany(mappedBy = "assessmentRubric", cascade = CascadeType.ALL, orphanRemoval = true) // https://www.baeldung.com/delete-with-hibernate
+    @JsonIgnore // https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+    private List<ItemRubric> itemList;
 
     public AssessmentRubric() {
 
@@ -92,6 +100,10 @@ public class AssessmentRubric {
     public LearningProcess getLearningProcess() { return learningProcess; }
 
     public void setLearningProcess(LearningProcess learningProcess) { this.learningProcess = learningProcess; }
+
+    public List<ItemRubric> getItemList() { return itemList; }
+
+    public void setItemList(List<ItemRubric> itemList) { this.itemList = itemList; }
 
 
     @Override
