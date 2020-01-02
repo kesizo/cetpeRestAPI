@@ -1,5 +1,6 @@
 package com.kesizo.cetpe.backend.restapi.service;
 
+import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
 import com.kesizo.cetpe.backend.restapi.model.LearningStudent;
 import com.kesizo.cetpe.backend.restapi.model.UserGroup;
 import com.kesizo.cetpe.backend.restapi.repository.LearningStudentRepository;
@@ -26,7 +27,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     @Override
-    public UserGroup getUserGroupByLearningProcessId(long learningProcess_id) {
+    public List<UserGroup> getUserGroupsByLearningProcessId(long learningProcess_id) {
         return this._userGroupRepository.findByLearningProcess_id(learningProcess_id);
     }
 
@@ -36,10 +37,11 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     @Override
-    public UserGroup createUserGroup(String name) {
+    public UserGroup createUserGroup(String name, LearningProcess learningProcess) {
         UserGroup newUserGroup = new UserGroup();
 
         newUserGroup.setName(name);
+        newUserGroup.setLearningProcess(learningProcess);
         newUserGroup = this._userGroupRepository.save(newUserGroup);
 
         return newUserGroup;

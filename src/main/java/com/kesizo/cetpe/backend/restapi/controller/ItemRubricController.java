@@ -22,13 +22,13 @@ import static com.kesizo.cetpe.backend.restapi.util.Constants.DATE_FORMATTER;
 @RestController
 public class ItemRubricController {
 
+    private Logger logger = LoggerFactory.getLogger(ItemRubricController.class);
+
     @Autowired
     private AssessmentRubricService _assessmentRubricService;
 
     @Autowired
     private ItemRubricService _itemRubricService;
-
-    private Logger logger = LoggerFactory.getLogger(ItemRubricController.class);
 
     @RequestMapping(value = "/api/cetpe/lprocess/rubric/item/{id}", method = RequestMethod.GET)
     public ItemRubric itemRubricById(@PathVariable String id){

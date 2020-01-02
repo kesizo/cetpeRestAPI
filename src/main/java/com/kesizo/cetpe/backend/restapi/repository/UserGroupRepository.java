@@ -4,6 +4,8 @@ import com.kesizo.cetpe.backend.restapi.model.UserGroup;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 /**
  * Now that we have the database ready, dependencies installed,
@@ -15,7 +17,7 @@ import org.springframework.stereotype.Repository;
 @Repository("userGroupRepository")
 public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
 
-    UserGroup findByLearningProcess_id(long learningProcess_id);
+    List<UserGroup> findByLearningProcess_id(long learningProcess_id);
 
 }
 
