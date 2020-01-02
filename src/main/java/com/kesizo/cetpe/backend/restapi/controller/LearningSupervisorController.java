@@ -1,10 +1,6 @@
 package com.kesizo.cetpe.backend.restapi.controller;
 
-import com.kesizo.cetpe.backend.restapi.model.ItemRubric;
-import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
 import com.kesizo.cetpe.backend.restapi.model.LearningSupervisor;
-import com.kesizo.cetpe.backend.restapi.service.AssessmentRubricService;
-import com.kesizo.cetpe.backend.restapi.service.ItemRubricService;
 import com.kesizo.cetpe.backend.restapi.service.LearningSupervisorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

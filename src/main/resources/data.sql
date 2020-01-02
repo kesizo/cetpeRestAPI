@@ -1,5 +1,5 @@
-INSERT INTO learning_process_status(id,name,description) values (0,'CEPTE Process Created',' Initial status for a peer evaluation process');
-INSERT INTO learning_process_status(id,name,description) values (1,'CEPTE Process Groups assigned','');
+--INSERT INTO learning_process_status(id,name,description) values (0,'CEPTE Process Created',' Initial status for a peer evaluation process');
+--INSERT INTO learning_process_status(id,name,description) values (1,'CEPTE Process Groups assigned','');
 
 INSERT INTO rubric_type(id,type) values (1,'Assessment of Contents');
 INSERT INTO rubric_type(id,type) values (2,'Assessment of Assesments');

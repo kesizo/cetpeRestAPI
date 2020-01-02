@@ -1,8 +1,12 @@
 package com.kesizo.cetpe.backend.restapi.model;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "learning_student")
@@ -32,6 +36,10 @@ public class LearningStudent {
     //the mappedBy must be the value of the attribute of the list from the other class
     @ManyToMany(mappedBy = "learningStudentList")
     private List<UserGroup> userGroupList;
+
+
+    @OneToMany(mappedBy = "learningStudent")
+    private Set<ItemRateByStudent> itemRatesByStudent; //This is the answer to the items (N:M rel with independent entity)
 
     public LearningStudent(){
 
@@ -85,5 +93,25 @@ public class LearningStudent {
         this.userGroupList = userGroupList;
     }
 
+    @Override
+    public String toString(){
+        String info = "";
+
+        JSONObject jsonInfo = new JSONObject();
+        try {
+            jsonInfo.put("id",this.id);
+            jsonInfo.put("username",this.username);
+            jsonInfo.put("firstName",this.firstName);
+            jsonInfo.put("lastName",this.lastName);
+            jsonInfo.put("itemRatesByStudent",this.itemRatesByStudent);
+            jsonInfo.put("userGroupList",this.userGroupList);
+
+        } catch (JSONException e) {
+            e.getStackTrace();
+        }
+
+        info = jsonInfo.toString();
+        return info;
+    }
 
 }

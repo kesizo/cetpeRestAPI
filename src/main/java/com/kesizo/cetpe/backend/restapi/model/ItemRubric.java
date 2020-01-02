@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "item_rubric")
@@ -29,6 +30,9 @@ public class ItemRubric {
     @ManyToOne
     @JoinColumn(name="assessmentRubric_id", nullable=false)
     private AssessmentRubric assessmentRubric;
+
+    @OneToMany(mappedBy = "itemRubric")
+    private Set<ItemRateByStudent> itemRatesByStudent; //This is the answer to the items (N:M rel)
 
     public ItemRubric() {
 
@@ -83,7 +87,7 @@ public class ItemRubric {
         jsonInfo.put("description",this.description);
         jsonInfo.put("weight",this.weight);
         jsonInfo.put("assessmentRubric",this.assessmentRubric);
-
+        jsonInfo.put("itemRatesByStudent",this.itemRatesByStudent);
         info = jsonInfo.toString();
         return info;
     }
