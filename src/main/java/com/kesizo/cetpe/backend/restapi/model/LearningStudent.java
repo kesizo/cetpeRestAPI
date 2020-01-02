@@ -37,7 +37,6 @@ public class LearningStudent {
     @ManyToMany(mappedBy = "learningStudentList")
     private List<UserGroup> userGroupList;
 
-
     @OneToMany(mappedBy = "learningStudent")
     private Set<ItemRateByStudent> itemRatesByStudent; //This is the answer to the items (N:M rel with independent entity)
 
@@ -91,6 +90,14 @@ public class LearningStudent {
 
     public void setUserGroupList(List<UserGroup> userGroupList) {
         this.userGroupList = userGroupList;
+    }
+
+    public Set<ItemRateByStudent> getItemRatesByStudent() {
+        return itemRatesByStudent;
+    }
+
+    public void setItemRatesByStudent(Set<ItemRateByStudent> itemRatesByStudent) {
+        this.itemRatesByStudent = itemRatesByStudent;
     }
 
     @Override
