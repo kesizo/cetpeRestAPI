@@ -7,6 +7,8 @@ import org.json.JSONObject;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -278,11 +280,34 @@ public class LearningProcess {
 
     public Set<UserGroup> getUserGroupSet() { return userGroupSet; }
 
-    public void setUserGroupSet(Set<UserGroup> userGroupSet) { this.userGroupSet = userGroupSet; }
+    public void addUserGroup(UserGroup userGroup) {
+        if (this.userGroupSet == null) {
+            this.userGroupSet = new HashSet<>();
+        }
+        this.userGroupSet.add(userGroup);
+    }
 
     public Set<AssessmentRubric> getRubricSet() { return rubricSet; }
 
-    public void setRubricSet(Set<AssessmentRubric> rubricSet) { this.rubricSet = rubricSet; }
+    public void addRubric(AssessmentRubric rubric) {
+        if (this.rubricSet == null) {
+            this.rubricSet = new HashSet<>();
+        }
+        this.rubricSet.add(rubric);
+    }
+
+    public Set<LearningSupervisor> getLearningSupervisorsSet() {
+        return learningSupervisorsSet;
+    }
+
+    public void addLearningSupervisor(LearningSupervisor learningSupervisor) {
+
+        if (this.learningSupervisorsSet == null) {
+            this.learningSupervisorsSet = new HashSet<>();
+        }
+        this.learningSupervisorsSet.add(learningSupervisor);
+    }
+
 
     @Override
     public String toString(){

@@ -1,9 +1,8 @@
 package com.kesizo.cetpe.backend.restapi.service;
 
 import com.kesizo.cetpe.backend.restapi.model.LearningStudent;
-import com.kesizo.cetpe.backend.restapi.model.LearningSupervisor;
 import com.kesizo.cetpe.backend.restapi.repository.LearningStudentRepository;
-import com.kesizo.cetpe.backend.restapi.repository.LearningSupervisorRepository;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

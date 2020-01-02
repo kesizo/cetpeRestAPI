@@ -15,6 +15,8 @@ import org.springframework.stereotype.Repository;
 @Repository("userGroupRepository")
 public interface UserGroupRepository extends JpaRepository<UserGroup, Long> {
 
+    UserGroup findByLearningProcess_id(long learningProcess_id);
+
 }
 
 

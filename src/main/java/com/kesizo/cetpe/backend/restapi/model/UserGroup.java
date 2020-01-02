@@ -75,6 +75,13 @@ public class UserGroup {
         this.learningStudentList.add(student);
     }
 
+    public LearningStudent getAuthorizedStudent() {
+        return authorizedStudent;
+    }
+
+    public void setAuthorizedStudent(LearningStudent authorizedStudent) {
+        this.authorizedStudent = authorizedStudent;
+    }
 
     @Override
     public String toString(){
@@ -85,6 +92,9 @@ public class UserGroup {
             jsonInfo.put("id",this.id);
             jsonInfo.put("name",this.name);
             jsonInfo.put("learningProcess",this.learningProcess);
+            jsonInfo.put("learningStudentList",this.learningStudentList);
+            jsonInfo.put("authorizedStudent",this.authorizedStudent);
+
         } catch (JSONException e) {
             e.getStackTrace();
         }

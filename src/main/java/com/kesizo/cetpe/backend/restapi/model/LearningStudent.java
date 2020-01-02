@@ -5,6 +5,8 @@ import org.json.JSONObject;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -88,16 +90,22 @@ public class LearningStudent {
         return userGroupList;
     }
 
-    public void setUserGroupList(List<UserGroup> userGroupList) {
-        this.userGroupList = userGroupList;
+    public void addUserGroupList(UserGroup userGroup) {
+        if(this.userGroupList == null){
+            this.userGroupList = new ArrayList<>();
+        }
+        this.userGroupList.add(userGroup);
     }
 
     public Set<ItemRateByStudent> getItemRatesByStudent() {
         return itemRatesByStudent;
     }
 
-    public void setItemRatesByStudent(Set<ItemRateByStudent> itemRatesByStudent) {
-        this.itemRatesByStudent = itemRatesByStudent;
+    public void addItemRatesByStudent(ItemRateByStudent itemRate){
+        if(this.itemRatesByStudent == null){
+            this.itemRatesByStudent = new HashSet<>();
+        }
+        this.itemRatesByStudent.add(itemRate);
     }
 
     @Override

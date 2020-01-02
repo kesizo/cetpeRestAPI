@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -76,6 +77,19 @@ public class ItemRubric {
 
     public void setAssessmentRubric(AssessmentRubric assessmentRubric) {
         this.assessmentRubric = assessmentRubric;
+    }
+
+
+    public Set<ItemRateByStudent> getItemRatesByStudent() {
+        return itemRatesByStudent;
+    }
+
+    public void addItemRatesByStudent(ItemRateByStudent itemRatesByStudent) {
+
+        if(this.itemRatesByStudent == null){
+            this.itemRatesByStudent = new HashSet<>();
+        }
+        this.itemRatesByStudent.add(itemRatesByStudent);
     }
 
     @Override

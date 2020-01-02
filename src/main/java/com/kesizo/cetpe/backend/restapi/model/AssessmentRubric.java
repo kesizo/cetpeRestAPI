@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -103,7 +104,12 @@ public class AssessmentRubric {
 
     public List<ItemRubric> getItemList() { return itemList; }
 
-    public void setItemList(List<ItemRubric> itemList) { this.itemList = itemList; }
+    public void addItemRubric(ItemRubric itemRubric){
+        if(this.itemList == null){
+            this.itemList = new ArrayList<>();
+        }
+        this.itemList.add(itemRubric);
+    }
 
 
     @Override
