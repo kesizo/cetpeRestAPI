@@ -20,11 +20,6 @@ public class LearningStudentServiceImpl implements LearningStudentService {
     private LearningStudentRepository _learningStudentRepository;
 
     @Override
-    public LearningStudent getLearningStudentById(long id) {
-        return this._learningStudentRepository.getOne(id);
-    }
-
-    @Override
     public LearningStudent getLearningStudentByUserName(String username) {
         return this._learningStudentRepository.findByUsername(username);
     }
@@ -48,8 +43,8 @@ public class LearningStudentServiceImpl implements LearningStudentService {
     }
 
     @Override
-    public LearningStudent updateLearningStudent(long learningStudentId, String username, String firstName, String lastName) {
-        LearningStudent studentUpdatable = this._learningStudentRepository.getOne(learningStudentId);
+    public LearningStudent updateLearningStudent(String username, String firstName, String lastName) {
+        LearningStudent studentUpdatable = this._learningStudentRepository.findByUsername(username);
 
         if (studentUpdatable!=null) {
             studentUpdatable.setUsername(username);
@@ -61,11 +56,11 @@ public class LearningStudentServiceImpl implements LearningStudentService {
     }
 
     @Override
-    public boolean deleteLearningStudent(long learningStudentId) {
+    public boolean deleteLearningStudent(String  learningStudentUsername) {
         boolean isDeleted = true;
 
         try {
-            this._learningStudentRepository.deleteById(learningStudentId);
+            this._learningStudentRepository.deleteByUsername(learningStudentUsername);
         } catch (Exception e) {
             isDeleted = false;
             logger.error(e.getMessage());

@@ -23,12 +23,6 @@ public class LearningSupervisorController {
         return _learningSupervisorService.getAllLearningSupervisors();
     }
 
-    @RequestMapping(value = "/api/cetpe/lsupervisor/{id}", method = RequestMethod.GET)
-    public LearningSupervisor learningSupervisorsById(@PathVariable String id){
-
-        return _learningSupervisorService.getLearningSupervisorById(Long.parseLong(id));
-    }
-
     @RequestMapping(value = "/api/cetpe/lsupervisor/username/{username}", method = RequestMethod.GET)
     public LearningSupervisor learningSupervisorsByUsername(@PathVariable String username){
 
@@ -47,24 +41,19 @@ public class LearningSupervisorController {
     }
 
     @PutMapping("/api/cetpe/lsupervisor/{id}")
-    public LearningSupervisor update(@PathVariable String id, @RequestBody Map<String, String> body) {
+    public LearningSupervisor update(@PathVariable String username, @RequestBody Map<String, String> body) {
 
-        long learningSupervisorId = Long.parseLong(id);
-
-        String username = body.get("username");
         String firstName = body.get("firstName");
         String lastName = body.get("lastName");
 
-        return _learningSupervisorService.updateLearningSupervisor(learningSupervisorId,username,firstName, lastName);
+        return _learningSupervisorService.updateLearningSupervisor(username,firstName, lastName);
 
     }
 
-
     @DeleteMapping("/api/cetpe/lsupervisor/{id}")
-    public boolean delete(@PathVariable String id) {
-        long learningSupervisorId = Long.parseLong(id);
+    public boolean delete(@PathVariable String username) {
 
-        return _learningSupervisorService.deleteLearningSupervisor(learningSupervisorId);
+        return _learningSupervisorService.deleteLearningSupervisor(username);
 
     }
 

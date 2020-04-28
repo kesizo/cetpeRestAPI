@@ -28,13 +28,13 @@ public class ItemRateByStudentServiceImpl implements ItemRateByStudentService
     }
 
     @Override
-    public List<ItemRateByStudent> getItemRatesByLearningStudentId(long learningStudentId) {
-        return this._itemRateByStudentRepository.findByLearningStudent_id(learningStudentId);
+    public List<ItemRateByStudent> getItemRatesByLearningStudentId(String learningStudent_username) {
+        return this._itemRateByStudentRepository.findByLearningStudent_username(learningStudent_username);
     }
 
     @Override
-    public List<ItemRateByStudent> getItemRatesByTargetStudentId(long targetStudentId) {
-        return this._itemRateByStudentRepository.findByTargetStudent_id(targetStudentId);
+    public List<ItemRateByStudent> getItemRatesByTargetStudentId(String learningStudent_username) {
+        return this._itemRateByStudentRepository.findByTargetStudent_username(learningStudent_username);
     }
 
     @Override

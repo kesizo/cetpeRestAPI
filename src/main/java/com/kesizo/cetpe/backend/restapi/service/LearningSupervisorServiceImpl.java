@@ -1,8 +1,6 @@
 package com.kesizo.cetpe.backend.restapi.service;
 
-import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
 import com.kesizo.cetpe.backend.restapi.model.LearningSupervisor;
-import com.kesizo.cetpe.backend.restapi.repository.LearningProcessStatusRepository;
 import com.kesizo.cetpe.backend.restapi.repository.LearningSupervisorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +17,6 @@ public class LearningSupervisorServiceImpl implements LearningSupervisorService 
 
     @Autowired
     private LearningSupervisorRepository _learningSupervisorRepository;
-
-
-    @Override
-    public LearningSupervisor getLearningSupervisorById(long id) {
-        return this._learningSupervisorRepository.getOne(id);
-    }
 
     @Override
     public LearningSupervisor getLearningSupervisorByUserName(String username) {
@@ -50,9 +42,9 @@ public class LearningSupervisorServiceImpl implements LearningSupervisorService 
     }
 
     @Override
-    public LearningSupervisor updateLearningSupervisor(long learningSupervisorId, String username, String firstName, String lastName) {
+    public LearningSupervisor updateLearningSupervisor(String username, String firstName, String lastName) {
 
-        LearningSupervisor supervisorUpdatable = this._learningSupervisorRepository.getOne(learningSupervisorId);
+        LearningSupervisor supervisorUpdatable = this._learningSupervisorRepository.findByUsername(username);
 
         if (supervisorUpdatable!=null) {
             supervisorUpdatable.setUsername(username);
@@ -65,12 +57,12 @@ public class LearningSupervisorServiceImpl implements LearningSupervisorService 
 
 
     @Override
-    public boolean deleteLearningSupervisor(long learningSupervisorId) {
+    public boolean deleteLearningSupervisor(String username) {
 
         boolean isDeleted = true;
 
         try {
-            this._learningSupervisorRepository.deleteById(learningSupervisorId);
+            this._learningSupervisorRepository.deleteByUsername(username);
         } catch (Exception e) {
             isDeleted = false;
             logger.error(e.getMessage());

@@ -4,8 +4,6 @@ import com.kesizo.cetpe.backend.restapi.model.LearningSupervisor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 
 /**
  * Now that we have the database ready, dependencies installed,
@@ -15,9 +13,11 @@ import java.util.List;
  */
 
 @Repository("learningSupervisorRepository")
-public interface LearningSupervisorRepository extends JpaRepository<LearningSupervisor, Long> {
+public interface LearningSupervisorRepository extends JpaRepository<LearningSupervisor, String> {
 
     LearningSupervisor findByUsername(String username);
+
+    boolean deleteByUsername(String username);
 }
 
 

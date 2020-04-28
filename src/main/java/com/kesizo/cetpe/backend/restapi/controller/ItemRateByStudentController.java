@@ -101,7 +101,7 @@ public class ItemRateByStudentController {
                     _itemRubricService.getItemRubricsByRubricId(rubric_id).forEach(itemRubric -> {
                         rateList.addAll(_itemRateService.getItemRatesByItemId(itemRubric.getId())
                                             .stream()
-                                            .filter(rate -> rate.getLearningStudent().equals(id_learningSudent))
+                                            .filter(rate -> rate.getLearningStudent().getUsername().equals(id_learningSudent))
                                             .collect(Collectors.toList()) );
                     });
                 }
@@ -116,7 +116,7 @@ public class ItemRateByStudentController {
 
         String justification = body.get("justification");
         int rate = Integer.parseInt(body.get("rate"));
-        long learningStudent_id = Long.parseLong(body.get("learningStudent_id"));
+        String learningStudent_username = body.get("learningStudent_id");
         long itemRubric_id = Long.parseLong(body.get("itemRubric_id"));
 
         long targetStudent_id = body.get("targetStudent_id")!=null && !body.get("targetStudent_id").isEmpty() ?
@@ -127,11 +127,10 @@ public class ItemRateByStudentController {
                                      Long.parseLong(body.get("targetUserGroup_id"))
                                     : 0;
 
-
         return _itemRateService.createItemRateByStudent(justification, rate,
-                                                        _learningStudentService.getLearningStudentById(learningStudent_id),
+                                                        _learningStudentService.getLearningStudentByUserName(learningStudent_username),
                                                         _itemRubricService.getItemRubricById(itemRubric_id),
-                                                        _learningStudentService.getLearningStudentById(targetStudent_id),
+                                                        _learningStudentService.getLearningStudentByUserName(learningStudent_username),
                                                         _userGroupService.getUserGroupById(targetUserGroup_id));
     }
 
@@ -142,7 +141,7 @@ public class ItemRateByStudentController {
 
         String justification = body.get("justification");
         int rate = Integer.parseInt(body.get("rate"));
-        long learningStudent_id = Long.parseLong(body.get("learningStudent_id"));
+        String learningStudent_username = body.get("learningStudent_id");
         long itemRubric_id = Long.parseLong(body.get("itemRubric_id"));
 
         long targetStudent_id = body.get("targetStudent_id")!=null && !body.get("targetStudent_id").isEmpty() ?
@@ -154,9 +153,9 @@ public class ItemRateByStudentController {
                 : 0;
 
         return _itemRateService.updateItemRateByStudent(itemRateByStudentId,justification, rate,
-                _learningStudentService.getLearningStudentById(learningStudent_id),
+                _learningStudentService.getLearningStudentByUserName(learningStudent_username),
                 _itemRubricService.getItemRubricById(itemRubric_id),
-                _learningStudentService.getLearningStudentById(targetStudent_id),
+                _learningStudentService.getLearningStudentByUserName(learningStudent_username),
                 _userGroupService.getUserGroupById(targetUserGroup_id));
     }
 
@@ -167,6 +166,4 @@ public class ItemRateByStudentController {
         return _itemRateService.deleteItemRateByStudent(itemRateId);
 
     }
-
-
 }

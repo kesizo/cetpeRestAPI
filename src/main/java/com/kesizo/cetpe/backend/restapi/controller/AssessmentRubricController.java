@@ -1,14 +1,10 @@
 package com.kesizo.cetpe.backend.restapi.controller;
 
 import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
-import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
 import com.kesizo.cetpe.backend.restapi.service.AssessmentRubricService;
 import com.kesizo.cetpe.backend.restapi.service.LearningProcessService;
-import com.kesizo.cetpe.backend.restapi.service.LearningProcessStatusService;
 import com.kesizo.cetpe.backend.restapi.service.RubricTypeService;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -40,6 +36,12 @@ public class AssessmentRubricController {
     public AssessmentRubric assessmentRubricById(@PathVariable String id){
         long assessmentRubricId = Long.parseLong(id);
         return _assessmentRubricService.getAssessmentRubricById(assessmentRubricId);
+    }
+
+    @RequestMapping(value = "/api/cetpe/lprocess/rubrics/by/lprocess/{id}", method = RequestMethod.GET)
+    public List<AssessmentRubric> rubricsByLearningProcessId(@PathVariable String id){
+        long learningProcessId = Long.parseLong(id);
+        return _assessmentRubricService.getAssessmentRubricsByLearningProcessId(learningProcessId);
     }
 
 

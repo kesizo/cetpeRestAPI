@@ -13,7 +13,9 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository("learningStudentRepository")
-public interface LearningStudentRepository extends JpaRepository<LearningStudent, Long> {
+public interface LearningStudentRepository extends JpaRepository<LearningStudent, String> {
+
+    boolean deleteByUsername(String username);
 
     LearningStudent findByUsername(String username);
 }

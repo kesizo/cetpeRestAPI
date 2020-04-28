@@ -1,13 +1,11 @@
 package com.kesizo.cetpe.backend.restapi.service;
 
-import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
 import com.kesizo.cetpe.backend.restapi.model.LearningSupervisor;
 
 import java.util.List;
 
 public interface LearningSupervisorService {
 
-    LearningSupervisor getLearningSupervisorById(long id);
 
     LearningSupervisor getLearningSupervisorByUserName(String username);
 
@@ -15,10 +13,10 @@ public interface LearningSupervisorService {
 
     LearningSupervisor createLearningSupervisor(String username, String firstName, String lastName);
 
-    LearningSupervisor updateLearningSupervisor(long learningSupervisorId,
+    LearningSupervisor updateLearningSupervisor(
                                                 String username,
                                                 String firstName,
                                                 String lastName);
 
-    boolean deleteLearningSupervisor(long learningSupervisorId);
+    boolean deleteLearningSupervisor(String username);
 }

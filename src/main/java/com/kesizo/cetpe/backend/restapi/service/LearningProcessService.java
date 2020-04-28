@@ -2,7 +2,8 @@ package com.kesizo.cetpe.backend.restapi.service;
 
 import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
 import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
-import org.springframework.transaction.annotation.Transactional;
+import com.kesizo.cetpe.backend.restapi.model.LearningSupervisor;
+import com.kesizo.cetpe.backend.restapi.model.UserGroup;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,9 @@ public interface LearningProcessService {
     LearningProcess getLearningProcessById(long id);
 
     List<LearningProcess> getAllLearningProcess();
+
+
+    List<LearningProcess> getLearningProcessBySupervisorUsername(String username);
 
     LearningProcess createLearningProcess(String name,
                                           String description,
@@ -30,6 +34,7 @@ public interface LearningProcessService {
                                           int weight_param_C,
                                           int weight_param_D,
                                           int weight_param_E,
+                                          LearningSupervisor supervisor,
                                           LearningProcessStatus status);
 
     LearningProcess updateLearningProcess(long learningProcessId,
@@ -50,7 +55,13 @@ public interface LearningProcessService {
                                           int weight_param_C,
                                           int weight_param_D,
                                           int weight_param_E,
+                                          LearningSupervisor supervisor,
                                           LearningProcessStatus status);
+
+
+    LearningProcess updateByAddingUserGroup(long learningProcessId, UserGroup newUserGroup);
+
+    LearningProcess updateByRemovingUserGroup(long learningProcessId, UserGroup newUserGroup);
 
     boolean deleteLearningProcess(long learningProcessId);
 }

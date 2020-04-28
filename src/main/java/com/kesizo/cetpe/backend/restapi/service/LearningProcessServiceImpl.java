@@ -2,8 +2,9 @@ package com.kesizo.cetpe.backend.restapi.service;
 
 import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
 import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
+import com.kesizo.cetpe.backend.restapi.model.LearningSupervisor;
+import com.kesizo.cetpe.backend.restapi.model.UserGroup;
 import com.kesizo.cetpe.backend.restapi.repository.LearningProcessRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,11 @@ public class LearningProcessServiceImpl implements LearningProcessService {
     }
 
     @Override
+    public List<LearningProcess> getLearningProcessBySupervisorUsername(String username) {
+        return this._learningProcessRepository.findBySupervisorUsername(username);
+    }
+
+    @Override
     public LearningProcess createLearningProcess(String name,
                                                 String description,
                                                 LocalDateTime starting_date_time,
@@ -48,7 +54,8 @@ public class LearningProcessServiceImpl implements LearningProcessService {
                                                 int weight_param_C,
                                                 int weight_param_D,
                                                 int weight_param_E,
-                                                LearningProcessStatus status) {
+                                                LearningSupervisor learning_supervisor,
+                                                LearningProcessStatus learning_process_status) {
 
         LearningProcess newLearningProcess = new LearningProcess();
 
@@ -69,15 +76,15 @@ public class LearningProcessServiceImpl implements LearningProcessService {
         newLearningProcess.setWeight_param_C(weight_param_C);
         newLearningProcess.setWeight_param_D(weight_param_D);
         newLearningProcess.setWeight_param_E(weight_param_E);
-        newLearningProcess.setStatus(status);
-
+        newLearningProcess.setLearning_supervisor(learning_supervisor);
+        newLearningProcess.setLearning_process_status(learning_process_status);
         newLearningProcess = this._learningProcessRepository.save(newLearningProcess);
         return newLearningProcess;
     }
 
 
     @Override
-    public LearningProcess updateLearningProcess(long learningProcessStatusId,
+    public LearningProcess updateLearningProcess(long learningProcessId,
                                                              String name,
                                                              String description,
                                                              LocalDateTime starting_date_time,
@@ -95,9 +102,10 @@ public class LearningProcessServiceImpl implements LearningProcessService {
                                                              int weight_param_C,
                                                              int weight_param_D,
                                                              int weight_param_E,
-                                                             LearningProcessStatus status) {
+                                                             LearningSupervisor learning_supervisor,
+                                                             LearningProcessStatus learning_process_status) {
 
-        LearningProcess lpUpdatable = this._learningProcessRepository.getOne(learningProcessStatusId);
+        LearningProcess lpUpdatable = this._learningProcessRepository.getOne(learningProcessId);
 
         if (lpUpdatable!=null) {
             lpUpdatable.setName(name);
@@ -117,16 +125,61 @@ public class LearningProcessServiceImpl implements LearningProcessService {
             lpUpdatable.setWeight_param_C(weight_param_C);
             lpUpdatable.setWeight_param_D(weight_param_D);
             lpUpdatable.setWeight_param_E(weight_param_E);
-            lpUpdatable.setStatus(status);
+            lpUpdatable.setLearning_supervisor(learning_supervisor);
+            lpUpdatable.setLearning_process_status(learning_process_status);
 
             lpUpdatable = this._learningProcessRepository.save(lpUpdatable);
         }
         else {
-            logger.warn("No learning process available with id "+learningProcessStatusId);
+            logger.warn("No learning process available with id "+learningProcessId);
             lpUpdatable = null;
         }
         return lpUpdatable;
     }
+
+    @Override
+    public LearningProcess updateByAddingUserGroup(long learningProcessId, UserGroup newUserGroup) {
+
+        LearningProcess lpUpdatable = this._learningProcessRepository.getOne(learningProcessId);
+
+        if (lpUpdatable!=null) {
+            newUserGroup.setLearningProcess(lpUpdatable);
+            lpUpdatable.addUserGroup(newUserGroup);
+            lpUpdatable = this._learningProcessRepository.save(lpUpdatable);
+        } else {
+            logger.warn("No learning process available with id "+learningProcessId);
+            lpUpdatable = null;
+        }
+        return lpUpdatable;
+    }
+
+    @Override
+    public LearningProcess updateByRemovingUserGroup(long learningProcessId, UserGroup toBeRemovedUserGroup) {
+
+        LearningProcess lpUpdatable = this._learningProcessRepository.getOne(learningProcessId);
+
+        if (lpUpdatable!=null) {
+            UserGroup existingToRemove = lpUpdatable.getUserGroupList().stream()
+                    .filter(userGroup -> userGroup.getId() == toBeRemovedUserGroup.getId())
+                    .findAny()
+                    .orElse(null);
+
+            if (existingToRemove!=null) {
+
+                lpUpdatable.getUserGroupList().remove(existingToRemove);
+                lpUpdatable = this._learningProcessRepository.save(lpUpdatable);
+            }
+            else {
+                logger.warn("The User group requested to remove doesn't exist in the process with id "+learningProcessId);
+            }
+
+        } else {
+            logger.warn("No learning process available with id "+learningProcessId);
+            lpUpdatable = null;
+        }
+        return lpUpdatable;
+    }
+
 
     @Override
     public boolean deleteLearningProcess(long learningProcessId) {

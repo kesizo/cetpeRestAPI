@@ -9,6 +9,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -83,15 +84,15 @@ public class LearningProcess {
 
     @OneToMany(mappedBy = "learningProcess", cascade = CascadeType.ALL, orphanRemoval = true) // https://www.baeldung.com/delete-with-hibernate
     @JsonIgnore // https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
-    private Set<UserGroup> userGroupSet;
+    private List<UserGroup> user_group_list;
 
-    @OneToMany(mappedBy = "learningProcess", cascade = CascadeType.ALL)
-    @JsonIgnore // https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
-    private Set<LearningSupervisor> learningSupervisorsSet;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supervisor_id")
+    private LearningSupervisor learning_supervisor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
-    private LearningProcessStatus status;
+    private LearningProcessStatus learning_process_status;
 
     public LearningProcess(long id, @Size(min = 3, max = 256) String name,
                            @Size(min = 1, max = 1024) String description,
@@ -108,6 +109,7 @@ public class LearningProcess {
                            int weight_param_C,
                            int weight_param_D,
                            int weight_param_E,
+                           LearningSupervisor supervisor,
                            LearningProcessStatus status) {
         this.id = id;
         this.name = name;
@@ -127,7 +129,8 @@ public class LearningProcess {
         this.weight_param_C = weight_param_C;
         this.weight_param_D = weight_param_D;
         this.weight_param_E = weight_param_E;
-        this.status = status;
+        this.learning_supervisor = supervisor;
+        this.learning_process_status = status;
     }
 
     public LearningProcess() { }
@@ -274,17 +277,42 @@ public class LearningProcess {
         this.weight_param_E = weight_param_E;
     }
 
-    public LearningProcessStatus getStatus() { return status; }
+    public LearningSupervisor getLearning_supervisor() {
+        return learning_supervisor;
+    }
 
-    public void setStatus(LearningProcessStatus status) { this.status = status; }
+    public void setLearning_supervisor(LearningSupervisor learning_supervisor) {
+        this.learning_supervisor = learning_supervisor;
+    }
 
-    public Set<UserGroup> getUserGroupSet() { return userGroupSet; }
+    public LearningProcessStatus getLearning_process_status() {
+        return learning_process_status;
+    }
+
+    public void setLearning_process_status(LearningProcessStatus learning_process_status) {
+        this.learning_process_status = learning_process_status;
+    }
+
+    public void setUserGroupList(List<UserGroup> user_group_list) {
+        this.user_group_list = user_group_list;
+    }
+
+    public List<UserGroup> getUserGroupList() { return user_group_list; }
 
     public void addUserGroup(UserGroup userGroup) {
-        if (this.userGroupSet == null) {
-            this.userGroupSet = new HashSet<>();
+        if (this.user_group_list == null) {
+            this.user_group_list = new ArrayList<>();
         }
-        this.userGroupSet.add(userGroup);
+        this.user_group_list.add(userGroup);
+    }
+
+    public void removeUserGroup(UserGroup userGroup) {
+        if (this.user_group_list == null) {
+            this.user_group_list = new ArrayList<>();
+        }
+        if (this.user_group_list.contains(userGroup)) {
+            this.user_group_list.remove(userGroup);
+        }
     }
 
     public Set<AssessmentRubric> getRubricSet() { return rubricSet; }
@@ -294,18 +322,6 @@ public class LearningProcess {
             this.rubricSet = new HashSet<>();
         }
         this.rubricSet.add(rubric);
-    }
-
-    public Set<LearningSupervisor> getLearningSupervisorsSet() {
-        return learningSupervisorsSet;
-    }
-
-    public void addLearningSupervisor(LearningSupervisor learningSupervisor) {
-
-        if (this.learningSupervisorsSet == null) {
-            this.learningSupervisorsSet = new HashSet<>();
-        }
-        this.learningSupervisorsSet.add(learningSupervisor);
     }
 
 
@@ -333,7 +349,9 @@ public class LearningProcess {
             jsonInfo.put("weight_param_C",this.weight_param_C);
             jsonInfo.put("weight_param_D",this.weight_param_D);
             jsonInfo.put("weight_param_E",this.weight_param_E);
-            jsonInfo.put("status",this.status);
+            jsonInfo.put("user_group_list", this.user_group_list);
+            jsonInfo.put("learning_supervisor",this.learning_supervisor);
+            jsonInfo.put("learning_process_status",this.learning_process_status);
 
         } catch (JSONException e) {
             e.getStackTrace();

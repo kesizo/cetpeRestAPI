@@ -13,9 +13,9 @@ public interface ItemRateByStudentService {
 
     List<ItemRateByStudent> getAllItemRates();
 
-    List<ItemRateByStudent> getItemRatesByLearningStudentId(long id);
+    List<ItemRateByStudent> getItemRatesByLearningStudentId(String learningStudent_username);
 
-    List<ItemRateByStudent> getItemRatesByTargetStudentId(long id);
+    List<ItemRateByStudent> getItemRatesByTargetStudentId(String learningStudent_username);
 
     List<ItemRateByStudent> getItemRatesByTargetUserGroupId(long id);
 

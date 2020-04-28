@@ -1,8 +1,6 @@
 package com.kesizo.cetpe.backend.restapi.controller;
 
 
-import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
-
 import com.kesizo.cetpe.backend.restapi.model.RubricType;
 import com.kesizo.cetpe.backend.restapi.service.RubricTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,7 @@ public class RubricTypeController {
 
     //Operations with the blogs. Retrieve (GET), Update (PUT), Remove (DELETE)
     @GetMapping("/api/cetpe/rubric/types/{id}")
-    public RubricType show(@PathVariable String id){
+    public RubricType rubricTypeById(@PathVariable String id){
         long rubricTypeId = Long.parseLong(id);
         return rubricTypeService.getRubricTypeById(rubricTypeId);
     }

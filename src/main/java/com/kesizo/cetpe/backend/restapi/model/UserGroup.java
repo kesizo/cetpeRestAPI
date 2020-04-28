@@ -1,9 +1,11 @@
 package com.kesizo.cetpe.backend.restapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,22 +23,26 @@ public class UserGroup {
 
 
     @Column(name = "name", nullable = false, length = 256)
+    @Size(min = 3, max = 256)
     private String name;
 
     @ManyToOne
     @JoinColumn(name="learningProcess_id", nullable=false)
+    @JsonIgnore
     private LearningProcess learningProcess;
+
 
     @ManyToMany
     @JoinTable(
             name = "rel_userGroup_learningStudent",
-            joinColumns = @JoinColumn(name = "userGroup_id", nullable = false),
-            inverseJoinColumns = @JoinColumn(name="learningStudent_id", nullable = false)
+            joinColumns = @JoinColumn(name = "userGroup_id", nullable = false, referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name="learningStudent_id", nullable = false, referencedColumnName = "username")
     ) //https://www.baeldung.com/jpa-many-to-many
+    //@JsonIgnore
     private List<LearningStudent> learningStudentList;
 
     @ManyToOne
-    @JoinColumn(name="learningStudent_id", nullable=false)
+    @JoinColumn(name="learningStudent_id", nullable=true)
     private LearningStudent authorizedStudent;
 
 
@@ -68,6 +74,15 @@ public class UserGroup {
         this.learningProcess = learningProcess;
     }
 
+
+    public List<LearningStudent> getLearningStudentList() {
+        return learningStudentList;
+    }
+
+    public void setLearningStudentList(List<LearningStudent> learningStudentList) {
+        this.learningStudentList = learningStudentList;
+    }
+
     public void addLearningStudent(LearningStudent student){
         if(this.learningStudentList == null){
             this.learningStudentList = new ArrayList<>();
@@ -91,9 +106,9 @@ public class UserGroup {
         try {
             jsonInfo.put("id",this.id);
             jsonInfo.put("name",this.name);
-            jsonInfo.put("learningProcess",this.learningProcess);
-            jsonInfo.put("learningStudentList",this.learningStudentList);
-            jsonInfo.put("authorizedStudent",this.authorizedStudent);
+            jsonInfo.put("learningProcess",this.learningProcess != null ? this.learningProcess : null);
+            jsonInfo.put("learningStudentList",this.learningStudentList != null ? this.learningStudentList : null);
+            jsonInfo.put("authorizedStudent",this.authorizedStudent != null ? this.authorizedStudent : null);
 
         } catch (JSONException e) {
             e.getStackTrace();
