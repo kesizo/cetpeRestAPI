@@ -4,9 +4,8 @@ import org.json.JSONObject;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "item_rubric")
@@ -33,7 +32,7 @@ public class ItemRubric {
     private AssessmentRubric assessmentRubric;
 
     @OneToMany(mappedBy = "itemRubric")
-    private Set<ItemRateByStudent> itemRatesByStudent; //This is the answer to the items (N:M rel)
+    private List<ItemRateByStudent> itemRatesByStudent; //This is the answer to the items (N:M rel)
 
     public ItemRubric() {
 
@@ -80,16 +79,28 @@ public class ItemRubric {
     }
 
 
-    public Set<ItemRateByStudent> getItemRatesByStudent() {
+    public List<ItemRateByStudent> getItemRatesByStudent() {
         return itemRatesByStudent;
+    }
+
+    public void setItemRatesByStudent(List<ItemRateByStudent> itemRatesByStudent) {
+
+        if(this.itemRatesByStudent == null){
+            this.itemRatesByStudent = new ArrayList<>();
+        }
+        else {
+            this.itemRatesByStudent = getItemRatesByStudent();
+        }
     }
 
     public void addItemRatesByStudent(ItemRateByStudent itemRatesByStudent) {
 
         if(this.itemRatesByStudent == null){
-            this.itemRatesByStudent = new HashSet<>();
+            this.itemRatesByStudent = new ArrayList<>();
         }
-        this.itemRatesByStudent.add(itemRatesByStudent);
+        else {
+            this.itemRatesByStudent.add(itemRatesByStudent);
+        }
     }
 
     @Override

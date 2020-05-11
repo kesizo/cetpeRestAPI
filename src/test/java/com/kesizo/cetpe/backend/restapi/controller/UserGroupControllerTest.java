@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -116,6 +118,7 @@ public class UserGroupControllerTest {
 
         //Convert JSON Result to object
         UserGroup[] userGroupList = this.mapper.readValue(result.getResponse().getContentAsString(), UserGroup[].class);
+        assertThat(userGroupList).isEmpty();
     }
 
     /**
@@ -162,7 +165,7 @@ public class UserGroupControllerTest {
         MvcResult results = mvc.perform(post(BASE_URL_LPROCESS+"/"+sLearningProcessTestId+"/group").content(userGroupJSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(userGroupName)))
                 .andReturn();
 
@@ -175,6 +178,97 @@ public class UserGroupControllerTest {
                 .andReturn();
 
     }
+
+
+    /**
+     * Should create a user groups from lprocess with id=1 and Name null
+     *
+     * @throws Exception
+     */
+    @Test(expected = org.springframework.web.util.NestedServletException.class)
+    public void shouldBadRequestCreateUserGroupWithNullName() throws Exception {
+
+
+        String userGroupName = null;
+
+        UserGroup userGroupObject = new UserGroup();
+        userGroupObject.setName(userGroupName);
+        userGroupObject.setLearningStudentList(new ArrayList<>());
+
+        LearningProcess currentLearningProcess = this.getMockTestLearningProcess();
+        userGroupObject.setLearningProcess(currentLearningProcess);
+
+        //Creating process JSON
+        byte[] userGroupJSON = this.mapper.writeValueAsString(userGroupObject).getBytes();
+
+        // CREATE THE USER GROUP
+        MvcResult results = mvc.perform(post(BASE_URL_LPROCESS+"/"+sLearningProcessTestId+"/group").content(userGroupJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+
+    /**
+     * Should create a user groups from lprocess with id=1 and Name empty
+     *
+     * @throws Exception
+     */
+    @Test(expected = org.springframework.web.util.NestedServletException.class)
+    public void shouldBadRequestCreateUserGroupWithEmptyName() throws Exception {
+
+
+        String userGroupName = "";
+
+        UserGroup userGroupObject = new UserGroup();
+        userGroupObject.setName(userGroupName);
+        userGroupObject.setLearningStudentList(new ArrayList<>());
+
+        LearningProcess currentLearningProcess = this.getMockTestLearningProcess();
+        userGroupObject.setLearningProcess(currentLearningProcess);
+
+        //Creating process JSON
+        byte[] userGroupJSON = this.mapper.writeValueAsString(userGroupObject).getBytes();
+
+        // CREATE THE USER GROUP
+        MvcResult results = mvc.perform(post(BASE_URL_LPROCESS+"/"+sLearningProcessTestId+"/group").content(userGroupJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+
+    /**
+     * Should create a user groups from lprocess with id=1 and Name length Higher Than256
+     *
+     * @throws Exception
+     */
+    @Test(expected = org.springframework.web.util.NestedServletException.class)
+    public void shouldBadRequestCreateUserGroupWithNameLengthHigherThan256() throws Exception {
+
+
+        String userGroupName = Stream.generate(() -> String.valueOf("a")).limit(257).collect(Collectors.joining());
+
+        UserGroup userGroupObject = new UserGroup();
+        userGroupObject.setName(userGroupName);
+        userGroupObject.setLearningStudentList(new ArrayList<>());
+
+        LearningProcess currentLearningProcess = this.getMockTestLearningProcess();
+        userGroupObject.setLearningProcess(currentLearningProcess);
+
+        //Creating process JSON
+        byte[] userGroupJSON = this.mapper.writeValueAsString(userGroupObject).getBytes();
+
+        // CREATE THE USER GROUP
+        MvcResult results = mvc.perform(post(BASE_URL_LPROCESS+"/"+sLearningProcessTestId+"/group").content(userGroupJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
 
 
     /**
@@ -200,7 +294,7 @@ public class UserGroupControllerTest {
         MvcResult result = mvc.perform(post(BASE_URL_LPROCESS+"/"+sLearningProcessTestId+"/group").content(userGroupJSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(userGroupName)))
                 .andReturn();
 
@@ -244,7 +338,7 @@ public class UserGroupControllerTest {
         MvcResult result = mvc.perform(post(BASE_URL_LPROCESS+"/"+sLearningProcessTestId+"/group").content(userGroupJSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(userGroupName)))
                 .andReturn();
 

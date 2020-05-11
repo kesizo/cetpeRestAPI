@@ -10,6 +10,7 @@ import com.kesizo.cetpe.backend.restapi.service.UserGroupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -67,6 +68,7 @@ public class UserGroupController {
 
 
     @PostMapping("/api/cetpe/lprocess/{id}/group")
+    @ResponseStatus(HttpStatus.CREATED) // Otherwise it returns 200 because is the default code for @RestController§
     public UserGroup create(@PathVariable String id,@RequestBody Map<String, Object> body) {
 
         String name = body.get("name").toString();

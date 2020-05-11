@@ -107,6 +107,66 @@ public class LearningProcessControllerTest {
     }
 
     /**
+     * Should get an internal server error when get a Learning process by a wrong url
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldNotFoundGetLearningProcessByBadURL() throws Exception {
+        mvc.perform(get(BASE_URL + "xxx")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    /**
+     * Should get an internal server error when get a Learning process by non-numeric id.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldNotFoundGetLearningProcessByBadID() throws Exception {
+        mvc.perform(get(BASE_URL + "/xxx")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+
+    /**
+     * Should get a HTTP Status 404 when Get Learning Process by id is not found.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldNotFoundGetLearningProcessByNonExistingID() throws Exception {
+
+
+        // Retrieve the list of all processes...
+        MvcResult result = mvc.perform(get(BASE_URL)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        LearningProcess[] users = this.mapper.readValue(result.getResponse().getContentAsString(), LearningProcess[].class);
+
+        // Search the process with the highest id...
+        LearningProcess learningProcessHighestId = Arrays.asList(users)
+                .stream()
+                .max((Comparator.comparing(LearningProcess::getId)))
+                .orElse(null);
+
+        String sNonExistingId = String.valueOf(0);
+
+        if (learningProcessHighestId!=null) {
+            sNonExistingId = String.valueOf(learningProcessHighestId.getId()+1);
+        }
+
+        // Search by id with a non-existing id by adding 1 to the highest id
+        mvc.perform(get(BASE_URL + sNonExistingId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    /**
      * Create a new Learning Process will return the created LearningProcess
      *
      * @throws Exception
@@ -124,16 +184,14 @@ public class LearningProcessControllerTest {
         learningProcessObject.setDescription(learningProcessDescription);
         learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
 
-        //Creating process JSON
+        // Creating process JSON
         byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
 
         // invoke Create Learning Process
         MvcResult results = mvc.perform(post(BASE_URL).content(learningProcessJSON)
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                ) //here ends invokeCreate
-                //.andExpect(status().isCreated())
-                .andExpect(status().isOk())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(learningProcessTitle)))
                 .andExpect(jsonPath("$.description", is(learningProcessDescription)))
                 .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
@@ -151,6 +209,99 @@ public class LearningProcessControllerTest {
                 .andExpect(jsonPath("$.description", is(learningProcessDescription)))
                 .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
                 .andExpect(jsonPath("$.learning_process_status.id", is(0)))
+                .andReturn();
+    }
+
+    /**
+     * Fail when creating a new Learning Process with null title
+     *
+     * @throws Exception
+     */
+    //@Test(expected = org.springframework.web.util.NestedServletException.class) // No needed because it's handled in the controller
+    @Test
+    public void shouldBadRequestCreateLearningProcessNullTitle() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = null;
+        String learningProcessDescription = "Test_description";
+        String learningProcessSupervisorUsername = "user";
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
+
+        //Creating process JSON
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // invoke Create Learning Process
+        MvcResult results = mvc.perform(post(BASE_URL).content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    /**
+     * Fail when creating a new Learning Process with null description
+     *
+     * @throws Exception
+     */
+    //@Test(expected = org.springframework.web.util.NestedServletException.class)
+    @Test
+    public void shouldBadRequestCreateLearningProcessNullDescription() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = "Test_title";
+        String learningProcessDescription = null;
+        String learningProcessSupervisorUsername = "user";
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
+
+        //Creating process JSON
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // invoke Create Learning Process
+        MvcResult results = mvc.perform(post(BASE_URL).content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    /**
+     * Fail when creating a new Learning Process with null supervisor
+     *
+     * @throws Exception
+     */
+    //@Test(expected = org.springframework.web.util.NestedServletException.class)
+    @Test
+    public void shouldBadRequestCreateLearningProcessNullSupervisor() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = "Test_title";
+        String learningProcessDescription = null;
+
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(null);
+
+        //Creating process JSON
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // invoke Create Learning Process
+        MvcResult results = mvc.perform(post(BASE_URL).content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+        )
+                .andExpect(status().isBadRequest())
                 .andReturn();
     }
 
@@ -179,7 +330,7 @@ public class LearningProcessControllerTest {
                 .content(learningProcessJSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(learningProcessTitle)))
                 .andExpect(jsonPath("$.description", is(learningProcessDescription)))
                 .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
@@ -216,6 +367,285 @@ public class LearningProcessControllerTest {
 
     }
 
+    @Test
+    public void shouldBadRequestUpdateLearningProcessNullTitle() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = "Test_title";
+        String learningProcessDescription = "Test_description";
+        String learningProcessSupervisorUsername = "user";
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
+
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // INSERT: Operation
+        MvcResult resultInsert = mvc.perform(post(BASE_URL)
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(learningProcessTitle)))
+                .andExpect(jsonPath("$.description", is(learningProcessDescription)))
+                .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
+                .andReturn();
+
+
+        LearningProcess learningProcessUpdatable = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), LearningProcess.class);
+        // Update the inserted learning process
+        learningProcessUpdatable.setName(null);
+        learningProcessUpdatable.setDescription(learningProcessDescription +" updated");
+        learningProcessJSON = this.mapper.writeValueAsString(learningProcessUpdatable).getBytes();
+
+        // UPDATE: Operation
+        MvcResult resultUpdate = mvc.perform(put(BASE_URL+"/"+learningProcessUpdatable.getId())
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test(expected = org.springframework.web.util.NestedServletException.class)
+    public void shouldBadRequestUpdateLearningProcessEmptyTitle() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = "Test_title";
+        String learningProcessDescription = "Test_description";
+        String learningProcessSupervisorUsername = "user";
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
+
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // INSERT: Operation
+        MvcResult resultInsert = mvc.perform(post(BASE_URL)
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(learningProcessTitle)))
+                .andExpect(jsonPath("$.description", is(learningProcessDescription)))
+                .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
+                .andReturn();
+
+
+        LearningProcess learningProcessUpdatable = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), LearningProcess.class);
+        // Update the inserted learning process
+        learningProcessUpdatable.setName("");
+        learningProcessUpdatable.setDescription(learningProcessDescription +" updated");
+        learningProcessJSON = this.mapper.writeValueAsString(learningProcessUpdatable).getBytes();
+
+        // UPDATE: Operation
+        MvcResult resultUpdate = mvc.perform(put(BASE_URL+"/"+learningProcessUpdatable.getId())
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    //@Test(expected = org.springframework.web.util.NestedServletException.class) since it's managed in the controller now it's not needed
+    @Test
+    public void shouldBadRequestUpdateLearningProcessNullDescription() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = "Test_title";
+        String learningProcessDescription = "Test_description";
+        String learningProcessSupervisorUsername = "user";
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
+
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // INSERT: Operation
+        MvcResult resultInsert = mvc.perform(post(BASE_URL)
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(learningProcessTitle)))
+                .andExpect(jsonPath("$.description", is(learningProcessDescription)))
+                .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
+                .andReturn();
+
+
+        LearningProcess learningProcessUpdatable = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), LearningProcess.class);
+        // Update the inserted learning process
+        learningProcessUpdatable.setName(learningProcessTitle +" updated");
+        learningProcessUpdatable.setDescription(null);
+        learningProcessJSON = this.mapper.writeValueAsString(learningProcessUpdatable).getBytes();
+
+        // UPDATE: Operation
+        MvcResult resultUpdate = mvc.perform(put(BASE_URL+"/"+learningProcessUpdatable.getId())
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    @Test(expected = org.springframework.web.util.NestedServletException.class)
+    public void shouldBadRequestUpdateLearningProcessEmptyDescription() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = "Test_title";
+        String learningProcessDescription = "Test_description";
+        String learningProcessSupervisorUsername = "user";
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
+
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // INSERT: Operation
+        MvcResult resultInsert = mvc.perform(post(BASE_URL)
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(learningProcessTitle)))
+                .andExpect(jsonPath("$.description", is(learningProcessDescription)))
+                .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
+                .andReturn();
+
+
+        LearningProcess learningProcessUpdatable = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), LearningProcess.class);
+        // Update the inserted learning process
+        learningProcessUpdatable.setName(learningProcessTitle +" updated");
+        learningProcessUpdatable.setDescription("");
+        learningProcessJSON = this.mapper.writeValueAsString(learningProcessUpdatable).getBytes();
+
+        // UPDATE: Operation
+        MvcResult resultUpdate = mvc.perform(put(BASE_URL+"/"+learningProcessUpdatable.getId())
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+    }
+
+    /**
+     * Delete an existing Learning Process will return the deleted LearningProcess
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldDeleteLearningProcess() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = "Test_title";
+        String learningProcessDescription = "Test_description";
+        String learningProcessSupervisorUsername = "user";
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
+
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // INSERT: Operation
+        MvcResult resultInsert = mvc.perform(post(BASE_URL)
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(learningProcessTitle)))
+                .andExpect(jsonPath("$.description", is(learningProcessDescription)))
+                .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
+                .andReturn();
+
+        LearningProcess learningProcessToDelete = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), LearningProcess.class);
+
+        // Check that one process is found in the database
+        mvc.perform(get(BASE_URL).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andReturn();
+
+
+        // Delete: Operation
+        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/"+learningProcessToDelete.getId())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$",is(true)))
+                .andReturn();
+
+        // Check that none processes are found in the database
+        mvc.perform(get(BASE_URL).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)))
+                .andReturn();
+
+    }
+
+
+    /**
+     *
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldNotFoundDeleteLearningProcessByBadID() throws Exception {
+
+        // Delete: Operation
+        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/xxx")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").doesNotExist())
+                .andReturn();
+    }
+
+    /**
+     *
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldNotFoundDeleteLearningProcessByBadURL() throws Exception {
+
+        // Delete: Operation
+        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"xxx")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").doesNotExist())
+                .andReturn();
+
+    }
+
+    /**
+     *
+     * Should get a 200 and false when deleting a Learning Process by id is not found.
+     *
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldReturnFalseDeleteLearningProcessByNonExistingID() throws Exception {
+
+        String sNonExistingId = String.valueOf(0);
+
+        // Delete: Operation
+        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/"+sNonExistingId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$",is(false)))
+                .andReturn();
+    }
 
     /**
      * Update an existing Learning Process will return the updated LearningProcess
@@ -242,12 +672,11 @@ public class LearningProcessControllerTest {
                 .content(learningProcessJSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(learningProcessTitle)))
                 .andExpect(jsonPath("$.description", is(learningProcessDescription)))
                 .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
                 .andReturn();
-
 
         LearningProcess learningProcessUpdatable = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), LearningProcess.class);
         // Update the inserted learning process
@@ -279,6 +708,53 @@ public class LearningProcessControllerTest {
 
 
     /**
+     * Update an existing Learning Process will return bad request when status learning process is null
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldBadRequestUpdateStatusLearningProcessNullStatus() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = "Test_title";
+        String learningProcessDescription = "Test_description";
+        String learningProcessSupervisorUsername = "user";
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
+
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // INSERT: Operation
+        MvcResult resultInsert = mvc.perform(post(BASE_URL)
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(learningProcessTitle)))
+                .andExpect(jsonPath("$.description", is(learningProcessDescription)))
+                .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
+                .andReturn();
+
+        LearningProcess learningProcessUpdatable = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), LearningProcess.class);
+        // Update the inserted learning process
+
+        learningProcessUpdatable.setLearning_process_status(null);
+        learningProcessJSON = this.mapper.writeValueAsString(learningProcessUpdatable).getBytes();
+
+        // UPDATE: Operation
+        MvcResult resultUpdate = mvc.perform(put(BASE_URL+"/"+learningProcessUpdatable.getId())
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+    }
+
+    /**
      * Add user groups to an existing Learning Process will return the updated LearningProcess
      *
      * @throws Exception
@@ -303,7 +779,7 @@ public class LearningProcessControllerTest {
                 .content(learningProcessJSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(learningProcessTitle)))
                 .andExpect(jsonPath("$.description", is(learningProcessDescription)))
                 .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
@@ -366,7 +842,7 @@ public class LearningProcessControllerTest {
                 .content(learningProcessJSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name", is(learningProcessTitle)))
                 .andExpect(jsonPath("$.description", is(learningProcessDescription)))
                 .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
@@ -412,58 +888,12 @@ public class LearningProcessControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-            //    .andExpect(jsonPath("$").exists())
-              //  .andExpect(jsonPath("$.userGroupList",hasSize(0)))
+                //    .andExpect(jsonPath("$").exists())
+                //  .andExpect(jsonPath("$.userGroupList",hasSize(0)))
                 .andReturn();
 
     }
 
-    /**
-     * Should get an internal server error when get a Learning process by non-numeric id.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void shouldNotFoundGetLearningProcessByBadId() throws Exception {
-        mvc.perform(get(BASE_URL + "xxx")
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    /**
-     * Should get a HTTP Status 404 when Get Learning Process by id is not found.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void should404ForNotFoundGetLearningProcessByNonExistingId() throws Exception {
-
-
-        // Retrieve the list of all processes...
-        MvcResult result = mvc.perform(get(BASE_URL)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        LearningProcess[] users = this.mapper.readValue(result.getResponse().getContentAsString(), LearningProcess[].class);
-
-        // Search the process with the highest id...
-        LearningProcess learningProcessHighestId = Arrays.asList(users)
-                .stream()
-                .max((Comparator.comparing(LearningProcess::getId)))
-                .orElse(null);
-
-        String sNonExistingId = String.valueOf(0);
-
-        if (learningProcessHighestId!=null) {
-            sNonExistingId = String.valueOf(learningProcessHighestId.getId()+1);
-        }
-
-        // Search by id with a non-existing id by adding 1 to the highest id
-        mvc.perform(get(BASE_URL + sNonExistingId)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
 
 
 //

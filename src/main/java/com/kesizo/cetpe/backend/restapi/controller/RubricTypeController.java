@@ -4,6 +4,7 @@ package com.kesizo.cetpe.backend.restapi.controller;
 import com.kesizo.cetpe.backend.restapi.model.RubricType;
 import com.kesizo.cetpe.backend.restapi.service.RubricTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,8 +23,21 @@ public class RubricTypeController {
     //Operations with the blogs. Retrieve (GET), Update (PUT), Remove (DELETE)
     @GetMapping("/api/cetpe/rubric/types/{id}")
     public RubricType rubricTypeById(@PathVariable String id){
-        long rubricTypeId = Long.parseLong(id);
-        return rubricTypeService.getRubricTypeById(rubricTypeId);
+
+        long rubricTypeId;
+        try {
+            rubricTypeId = Long.parseLong(id);
+        } catch (NumberFormatException nfe) {
+           throw new ResourceNotFoundException("The id provided is not a valid number");
+        }
+
+        RubricType retrieved = rubricTypeService.getRubricTypeById(rubricTypeId);
+
+        if (retrieved==null) {
+            throw new ResourceNotFoundException("Rubric type with id= " + id + " not found");
+        }
+
+        return retrieved;
     }
 
 }

@@ -1,8 +1,6 @@
 package com.kesizo.cetpe.backend.restapi.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.json.JSONObject;
 
 import javax.persistence.*;
@@ -11,7 +9,6 @@ import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "assessment_rubric")
@@ -40,6 +37,10 @@ public class AssessmentRubric {
     @Min(1)
     private int rank;
 
+
+    @Column(name = "enabled", nullable = false, columnDefinition = "boolean default true")
+    private boolean enabled;
+
     //@ManyToOne(fetch = FetchType.LAZY, cascade= CascadeType.ALL) //in this way it removes the type when removing
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rubricType_id")
@@ -48,6 +49,10 @@ public class AssessmentRubric {
     @ManyToOne
     @JoinColumn(name="learningProcess_id", nullable=false)
     private LearningProcess learningProcess;
+
+    public void setItemList(List<ItemRubric> itemList) {
+        this.itemList = itemList;
+    }
 
     // This cascade and orphanRemoval means that all children rubrics will be removed when the learning process is removed
     @OneToMany(mappedBy = "assessmentRubric", cascade = CascadeType.ALL, orphanRemoval = true) // https://www.baeldung.com/delete-with-hibernate
@@ -63,6 +68,7 @@ public class AssessmentRubric {
                             LocalDateTime starting_date_time,
                             LocalDateTime end_date_time,
                             @Min(1) int rank,
+                            boolean enabled,
                             RubricType rubricType,
                             LearningProcess learningProcess) {
         this.id = id;
@@ -70,6 +76,7 @@ public class AssessmentRubric {
         this.starting_date_time = starting_date_time;
         this.end_date_time = end_date_time;
         this.rank = rank;
+        this.enabled = enabled;
         this.rubricType = rubricType;
         this.learningProcess = learningProcess;
     }
@@ -111,6 +118,13 @@ public class AssessmentRubric {
         this.itemList.add(itemRubric);
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     @Override
     public String toString(){
@@ -122,6 +136,7 @@ public class AssessmentRubric {
         jsonInfo.put("starting_date_time",this.starting_date_time);
         jsonInfo.put("end_date_time",this.end_date_time);
         jsonInfo.put("rank",this.rank);
+        jsonInfo.put("enabled",this.enabled);
         jsonInfo.put("rubricType",this.rubricType);
         jsonInfo.put("learningProcess",this.learningProcess);
 

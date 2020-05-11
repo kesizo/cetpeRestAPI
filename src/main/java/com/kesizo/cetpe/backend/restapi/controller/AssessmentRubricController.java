@@ -54,12 +54,13 @@ public class AssessmentRubricController {
         LocalDateTime starting_date_time = LocalDateTime.parse(body.get("starting_date_time"), formatter);
         LocalDateTime end_date_time = LocalDateTime.parse(body.get("end_date_time"), formatter);
         int rank = Integer.parseInt(body.get("rank"));
+        boolean enabled = Boolean.parseBoolean(body.get("enabled"));
 
         long rubricType_id = Long.parseLong(body.get("rubricType_id"));
         long learningProcess_id = Long.parseLong(body.get("learningProcess_id"));
 
         return _assessmentRubricService.createAssessmentRubric(title, starting_date_time,
-                                                                end_date_time, rank,
+                                                                end_date_time, rank, enabled,
                                                                 _rubricTypeService.getRubricTypeById(rubricType_id),
                                                                 _learningProcessService.getLearningProcessById(learningProcess_id));
     }
@@ -74,16 +75,15 @@ public class AssessmentRubricController {
         LocalDateTime starting_date_time = LocalDateTime.parse(body.get("starting_date_time"), formatter);
         LocalDateTime end_date_time = LocalDateTime.parse(body.get("end_date_time"), formatter);
         int rank = Integer.parseInt(body.get("rank"));
+        boolean enabled = Boolean.parseBoolean(body.get("enabled"));
 
         long rubricType_id = Long.parseLong(body.get("rubricType_id"));
         long learningProcess_id = Long.parseLong(body.get("learningProcess_id"));
 
         return _assessmentRubricService.updateAssessmentRubric(assessmentRubricId, title, starting_date_time,
-                end_date_time, rank,
+                end_date_time, rank, enabled,
                 _rubricTypeService.getRubricTypeById(rubricType_id),
                 _learningProcessService.getLearningProcessById(learningProcess_id));
-
-
     }
 
     @DeleteMapping("/api/cetpe/lprocess/rubric/{id}")

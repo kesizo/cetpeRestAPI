@@ -17,6 +17,8 @@ public interface LearningProcessService {
 
     List<LearningProcess> getLearningProcessBySupervisorUsername(String username);
 
+    List<LearningProcess> getLearningProcessByStudentUsername(String studentUsername);
+
     LearningProcess createLearningProcess(String name,
                                           String description,
                                           LocalDateTime starting_date_time,

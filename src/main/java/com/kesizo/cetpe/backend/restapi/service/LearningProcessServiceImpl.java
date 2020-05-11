@@ -23,7 +23,10 @@ public class LearningProcessServiceImpl implements LearningProcessService {
 
     @Override
     public LearningProcess getLearningProcessById(long id) {
-        return this._learningProcessRepository.getOne(id);
+        // IMPORTANT: difference between getOne abd findById
+        // https://www.javacodemonk.com/difference-between-getone-and-findbyid-in-spring-data-jpa-3a96c3ff
+        //return this._learningProcessRepository.getOne(id); //throws NestedException if not found
+        return this._learningProcessRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -34,6 +37,11 @@ public class LearningProcessServiceImpl implements LearningProcessService {
     @Override
     public List<LearningProcess> getLearningProcessBySupervisorUsername(String username) {
         return this._learningProcessRepository.findBySupervisorUsername(username);
+    }
+
+    @Override
+    public List<LearningProcess> getLearningProcessByStudentUsername(String studentUsername) {
+        return this._learningProcessRepository.findByStudentEnrolledUserName(studentUsername);
     }
 
     @Override
@@ -140,7 +148,7 @@ public class LearningProcessServiceImpl implements LearningProcessService {
     @Override
     public LearningProcess updateByAddingUserGroup(long learningProcessId, UserGroup newUserGroup) {
 
-        LearningProcess lpUpdatable = this._learningProcessRepository.getOne(learningProcessId);
+        LearningProcess lpUpdatable = this._learningProcessRepository.findById(learningProcessId).orElse(null);
 
         if (lpUpdatable!=null) {
             newUserGroup.setLearningProcess(lpUpdatable);
@@ -156,7 +164,7 @@ public class LearningProcessServiceImpl implements LearningProcessService {
     @Override
     public LearningProcess updateByRemovingUserGroup(long learningProcessId, UserGroup toBeRemovedUserGroup) {
 
-        LearningProcess lpUpdatable = this._learningProcessRepository.getOne(learningProcessId);
+        LearningProcess lpUpdatable = this._learningProcessRepository.findById(learningProcessId).orElse(null);
 
         if (lpUpdatable!=null) {
             UserGroup existingToRemove = lpUpdatable.getUserGroupList().stream()
