@@ -113,7 +113,7 @@ public class LearningProcessServiceImpl implements LearningProcessService {
                                                              LearningSupervisor learning_supervisor,
                                                              LearningProcessStatus learning_process_status) {
 
-        LearningProcess lpUpdatable = this._learningProcessRepository.getOne(learningProcessId);
+        LearningProcess lpUpdatable = this._learningProcessRepository.findById(learningProcessId).orElse(null);
 
         if (lpUpdatable!=null) {
             lpUpdatable.setName(name);

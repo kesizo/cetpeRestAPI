@@ -157,7 +157,7 @@ public class LearningProcessStatusControllerTest {
     public void shouldReturnNothingGetStatusTypeByBadId() throws Exception {
         mvc.perform(get(BASE_URL + "/xxx")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
 

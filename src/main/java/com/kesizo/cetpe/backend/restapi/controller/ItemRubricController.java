@@ -1,23 +1,15 @@
 package com.kesizo.cetpe.backend.restapi.controller;
 
-import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.model.ItemRubric;
 import com.kesizo.cetpe.backend.restapi.service.AssessmentRubricService;
 import com.kesizo.cetpe.backend.restapi.service.ItemRubricService;
-import com.kesizo.cetpe.backend.restapi.service.LearningProcessService;
-import com.kesizo.cetpe.backend.restapi.service.RubricTypeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.kesizo.cetpe.backend.restapi.util.Constants.DATE_FORMATTER;
 
 @RestController
 public class ItemRubricController {

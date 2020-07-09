@@ -5,7 +5,9 @@ import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
 import com.kesizo.cetpe.backend.restapi.service.LearningProcessStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -28,7 +30,8 @@ public class LearningProcessStatusController {
         try {
             learningProcessStatusId = Long.parseLong(id);
         } catch (NumberFormatException nfe) {
-            throw new ResourceNotFoundException("The id provided is not a valid number id");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error id parameter is not numeric", nfe);
         }
 
 

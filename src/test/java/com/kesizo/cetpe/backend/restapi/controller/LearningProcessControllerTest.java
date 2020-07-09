@@ -127,7 +127,7 @@ public class LearningProcessControllerTest {
     public void shouldNotFoundGetLearningProcessByBadID() throws Exception {
         mvc.perform(get(BASE_URL + "/xxx")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
 
@@ -161,7 +161,7 @@ public class LearningProcessControllerTest {
         }
 
         // Search by id with a non-existing id by adding 1 to the highest id
-        mvc.perform(get(BASE_URL + sNonExistingId)
+        mvc.perform(get(BASE_URL + "/"+sNonExistingId)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -604,7 +604,7 @@ public class LearningProcessControllerTest {
         // Delete: Operation
         MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/xxx")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$").doesNotExist())
                 .andReturn();
     }

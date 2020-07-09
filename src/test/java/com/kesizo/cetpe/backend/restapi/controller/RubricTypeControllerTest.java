@@ -140,7 +140,7 @@ public class RubricTypeControllerTest {
     public void shouldReturnNothingGetRubricTypeByBadURL() throws Exception {
         mvc.perform(get(BASE_URL + "xxx")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     /**
@@ -152,7 +152,7 @@ public class RubricTypeControllerTest {
     public void shouldReturnNothingGetRubricTypeByBadId() throws Exception {
         mvc.perform(get(BASE_URL + "/xxx")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     /**

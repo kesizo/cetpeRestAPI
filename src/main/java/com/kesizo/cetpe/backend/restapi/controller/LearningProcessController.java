@@ -63,8 +63,11 @@ public class LearningProcessController {
             learningProcessId = Long.parseLong(id);
         }
         catch (NumberFormatException nfe) {
-            throw new ResourceNotFoundException("The id provided is not a valid number id");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error id parameter is not numeric", nfe);
+
         }
+
 
         LearningProcess currentProcess = _learningProcessService.getLearningProcessById(learningProcessId);
         if (currentProcess==null) {
@@ -110,11 +113,15 @@ public class LearningProcessController {
                 supervisorObject = mapper.readValue(supervisorJSON, LearningSupervisor.class);
 
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                return null;
+                logger.warn("Error when converting passed mandatory parameter to JSON provided when creating rubric");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided when creating rubric", e);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn("Error when converting JSON parameter to model object when creating rubric");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object when creating rubric", e);
             }
+
             LearningProcess currentLearningProcess = _learningProcessService.createLearningProcess(
                     name, description,
                     LocalDateTime.now(), LocalDateTime.now(),
@@ -196,12 +203,14 @@ public class LearningProcessController {
                 learningProcessStatusObject = mapper.readValue(learningProcessStatusJSON, LearningProcessStatus.class);
 
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                return null;
+                logger.warn("Error when converting passed mandatory parameter to JSON provided when creating rubric");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided when creating rubric", e);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn("Error when converting JSON parameter to model object when creating rubric");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object when creating rubric", e);
             }
-
             return _learningProcessService.updateLearningProcess(learningProcessId,
                     name, description,
                     starting_date_time, end_date_time,
@@ -277,7 +286,8 @@ public class LearningProcessController {
         try {
             learningProcessId = Long.parseLong(id);
         } catch (NumberFormatException nfe) {
-            throw new ResourceNotFoundException("The id provided is not a valid process number id");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error id parameter is not numeric", nfe);
         }
 
         return _learningProcessService.deleteLearningProcess(learningProcessId);

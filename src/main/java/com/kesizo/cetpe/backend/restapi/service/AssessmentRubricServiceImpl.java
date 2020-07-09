@@ -23,7 +23,11 @@ public class AssessmentRubricServiceImpl implements AssessmentRubricService
 
     @Override
     public AssessmentRubric getAssessmentRubricById(long id) {
-        return this._assessmentRubricRepository.getOne(id);
+        // IMPORTANT: difference between getOne abd findById
+        // https://www.javacodemonk.com/difference-between-getone-and-findbyid-in-spring-data-jpa-3a96c3ff
+        //return this._learningProcessRepository.getOne(id); //throws NestedException if not found
+        return this._assessmentRubricRepository.findById(id).orElse(null);
+
     }
 
     @Override
