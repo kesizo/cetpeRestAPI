@@ -113,13 +113,13 @@ public class LearningProcessController {
                 supervisorObject = mapper.readValue(supervisorJSON, LearningSupervisor.class);
 
             } catch (JsonProcessingException e) {
-                logger.warn("Error when converting passed mandatory parameter to JSON provided when creating rubric");
+                logger.warn("Error when converting passed mandatory parameter to JSON provided when creating learning process");
                 throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided when creating rubric", e);
+                        HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided when creating learning process", e);
             } catch (IOException e) {
-                logger.warn("Error when converting JSON parameter to model object when creating rubric");
+                logger.warn("Error when converting JSON parameter to model object when creating learning process");
                 throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object when creating rubric", e);
+                        HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object when creating learning process", e);
             }
 
             LearningProcess currentLearningProcess = _learningProcessService.createLearningProcess(
@@ -203,13 +203,13 @@ public class LearningProcessController {
                 learningProcessStatusObject = mapper.readValue(learningProcessStatusJSON, LearningProcessStatus.class);
 
             } catch (JsonProcessingException e) {
-                logger.warn("Error when converting passed mandatory parameter to JSON provided when creating rubric");
+                logger.warn("Error when converting passed mandatory parameter to JSON provided updating learning process");
                 throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided when creating rubric", e);
+                        HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided updating learning process", e);
             } catch (IOException e) {
-                logger.warn("Error when converting JSON parameter to model object when creating rubric");
+                logger.warn("Error when converting JSON parameter to model object updating learning process");
                 throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object when creating rubric", e);
+                        HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object updating learning process", e);
             }
             return _learningProcessService.updateLearningProcess(learningProcessId,
                     name, description,
@@ -246,11 +246,13 @@ public class LearningProcessController {
             userGroupToAddObject = Arrays.asList(mapper.readValue(userGroupToAddJSON, UserGroup[].class)); // This is faster option
 
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
+            logger.warn("Error when converting passed mandatory parameter to JSON provided when adding user group ");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided when adding user group", e);
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            logger.warn("Error when converting JSON parameter to model object when adding user group");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object when adding user group", e);
         }
 
         return _learningProcessService.updateByAddingUserGroup(learningProcessId,userGroupToAddObject.get(0));
@@ -269,12 +271,15 @@ public class LearningProcessController {
             userGroupToRemoveJSON = mapper.writeValueAsString(userGroup);
             userGroupToRemoveObject = Arrays.asList(mapper.readValue(userGroupToRemoveJSON, UserGroup[].class));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return null;
+            logger.warn("Error when converting passed mandatory parameter to JSON provided when removing user group ");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided when removing user group", e);
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            logger.warn("Error when converting JSON parameter to model object when removing user group");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object when removing user group", e);
         }
+
 
         return _learningProcessService.updateByRemovingUserGroup(learningProcessId,userGroupToRemoveObject.get(0));
     }
