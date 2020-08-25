@@ -1,6 +1,5 @@
 package com.kesizo.cetpe.backend.restapi.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -24,16 +23,14 @@ public class LearningSupervisor {
     @Id
     @Column(name="username", unique=true, nullable = false, length = 256)
     @Size(min = 3, max = 256) // it requires to have at least 3 characters
-    @JsonProperty("username")
     private String username;
 
-    @JsonProperty("firstName")
     @Column(name="first_name", nullable = false, length = 256)
     @Size(min = 3, max = 256)
     private String firstName;
 
-    @JsonProperty("lastName")
     @Column(name="last_name", nullable = false, length = 256)
+    @Size(min = 1, max = 256)
     private String lastName;
 
     public LearningSupervisor(){

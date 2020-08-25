@@ -29,6 +29,7 @@ public class LearningStudent {
     private String firstName;
 
     @Column(name="last_name", nullable = false, length = 256)
+    @Size(min = 1, max = 256)
     private String lastName;
 
     //https://www.baeldung.com/jpa-many-to-many
