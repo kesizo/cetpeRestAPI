@@ -5,6 +5,7 @@ import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
 import com.kesizo.cetpe.backend.restapi.model.LearningSupervisor;
 import com.kesizo.cetpe.backend.restapi.model.RubricType;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -43,6 +45,7 @@ public class AssessmentRubricControllerTest {
 
 
     private static final String BASE_URL = "/api/cetpe/rubric";
+    private static final String BASE_URL_WITH_SUFFIX = "/api/cetpe/rubrics/by/lprocess";
 
     @Autowired
     private MockMvc mvc; //MockMvc allows us to exercise our @RestController class without starting a server
@@ -88,6 +91,19 @@ public class AssessmentRubricControllerTest {
                 "name, starting_date_time, weight_param_a, weight_param_b, weight_param_c, weight_param_d, weight_param_e, status_id, supervisor_id)\n" +
                 " VALUES ("+sLearningProcessTestId+",'description', current_timestamp, false, false, false, false, 0, 0, 0, 0, 'test', current_timestamp, 20, 20, 20, 20, 20, 1, 'user');");
 
+
+    }
+
+    @After
+    public void tearDown() {
+        // Always start from known state
+        jdbcTemplate.execute("DELETE FROM assessment_rubric;" +
+                "DELETE FROM user_group;" +
+                "DELETE FROM learning_process;" +
+                "DELETE FROM learning_supervisor;" +
+                "DELETE FROM learning_process_status;" +
+                "DELETE FROM rubric_type;" +
+                "DELETE FROM learning_student;");
     }
 
 
@@ -157,6 +173,70 @@ public class AssessmentRubricControllerTest {
         rubricObject.setEnabled(rubricIsEnabled);
         rubricObject.setRank(rubricRank);
 
+        rubricObject.setRubricType(getMockTestRubricType());
+        rubricObject.setLearningProcess(getMockTestLearningProcess());
+
+        // Creating process JSON
+        byte[] rubricJSON = this.mapper.writeValueAsString(rubricObject).getBytes();
+
+        // invoke Create
+        MvcResult results = mvc.perform(post(BASE_URL).content(rubricJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title", is(rubricTitle)))
+                .andExpect(jsonPath("$.rank", is(rubricRank)))
+                .andExpect(jsonPath("$.enabled", is(rubricIsEnabled)))
+                .andReturn();
+    }
+
+    @Test
+    public void shouldCreateAssessmentRubricWithEmptyItemList() throws Exception {
+
+        // Creating Rubric object using test values
+        String rubricTitle = "test_rubric_title";
+        int rubricRank = 4;
+        boolean rubricIsEnabled = true;
+
+        AssessmentRubric rubricObject = new AssessmentRubric();
+        rubricObject.setTitle(rubricTitle);
+        rubricObject.setStarting_date_time(LocalDateTime.now());
+        rubricObject.setEnd_date_time(LocalDateTime.now());
+        rubricObject.setEnabled(rubricIsEnabled);
+        rubricObject.setRank(rubricRank);
+        rubricObject.setItemList(new ArrayList<>());
+        rubricObject.setRubricType(getMockTestRubricType());
+        rubricObject.setLearningProcess(getMockTestLearningProcess());
+
+        // Creating process JSON
+        byte[] rubricJSON = this.mapper.writeValueAsString(rubricObject).getBytes();
+
+        // invoke Create
+        MvcResult results = mvc.perform(post(BASE_URL).content(rubricJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title", is(rubricTitle)))
+                .andExpect(jsonPath("$.rank", is(rubricRank)))
+                .andExpect(jsonPath("$.enabled", is(rubricIsEnabled)))
+                .andReturn();
+    }
+
+    @Test
+    public void shouldCreateAssessmentRubricWithNullItemList() throws Exception {
+
+        // Creating Rubric object using test values
+        String rubricTitle = "test_rubric_title";
+        int rubricRank = 4;
+        boolean rubricIsEnabled = true;
+
+        AssessmentRubric rubricObject = new AssessmentRubric();
+        rubricObject.setTitle(rubricTitle);
+        rubricObject.setStarting_date_time(LocalDateTime.now());
+        rubricObject.setEnd_date_time(LocalDateTime.now());
+        rubricObject.setEnabled(rubricIsEnabled);
+        rubricObject.setRank(rubricRank);
+        rubricObject.setItemList(null);
         rubricObject.setRubricType(getMockTestRubricType());
         rubricObject.setLearningProcess(getMockTestLearningProcess());
 
@@ -293,7 +373,49 @@ public class AssessmentRubricControllerTest {
 
     }
 
+    /**
+     * Should return the rubrics associated to the LearningProcessId passed as parameter in the url
+     *
+     */
+    @Test
+    public void shouldRetrieveRubricsAssociatedToLearningProcessId() throws Exception {
 
+        // Creating Rubric object using test values
+        String rubricTitle = "test_rubric_title";
+        int rubricRank = 4;
+        boolean rubricIsEnabled = true;
+
+        AssessmentRubric rubricObject = new AssessmentRubric();
+        rubricObject.setTitle(rubricTitle);
+        rubricObject.setStarting_date_time(LocalDateTime.now());
+        rubricObject.setEnd_date_time(LocalDateTime.now());
+        rubricObject.setEnabled(rubricIsEnabled);
+        rubricObject.setRank(rubricRank);
+
+        rubricObject.setRubricType(getMockTestRubricType());
+        rubricObject.setLearningProcess(getMockTestLearningProcess());
+
+        // Creating process JSON
+        byte[] rubricJSON = this.mapper.writeValueAsString(rubricObject).getBytes();
+
+        // invoke Create
+        MvcResult resultInsert = mvc.perform(post(BASE_URL).content(rubricJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.title", is(rubricTitle)))
+                .andExpect(jsonPath("$.rank", is(rubricRank)))
+                .andExpect(jsonPath("$.enabled", is(rubricIsEnabled)))
+                .andReturn();
+
+        // GET: Operation Check
+        MvcResult result = mvc.perform(get(BASE_URL_WITH_SUFFIX+"/"+getMockTestLearningProcess().getId())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andReturn();
+    }
 
     /**
      * Auxiliary method

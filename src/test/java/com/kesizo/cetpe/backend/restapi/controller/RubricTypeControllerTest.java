@@ -2,6 +2,7 @@ package com.kesizo.cetpe.backend.restapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kesizo.cetpe.backend.restapi.model.RubricType;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,6 +68,19 @@ public class RubricTypeControllerTest {
                 "INSERT INTO rubric_type(id,type) values (3,'Group based Assessment');\n" +
                 "INSERT INTO rubric_type(id,type) values (4,'Group members Assessment');");
         }
+
+    @After
+    public void tearDown() {
+
+        jdbcTemplate.execute("DELETE FROM assessment_rubric;" +
+                "DELETE FROM rel_user_group_learning_student;" +
+                "DELETE FROM user_group;" +
+                "DELETE FROM learning_process;" +
+                "DELETE FROM learning_supervisor;" +
+                "DELETE FROM learning_process_status;" +
+                "DELETE FROM rubric_type;" +
+                "DELETE FROM learning_student;");
+    }
 
 
     @Test

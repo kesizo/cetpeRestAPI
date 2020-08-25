@@ -19,7 +19,11 @@ public class ItemRateByStudentServiceImpl implements ItemRateByStudentService
 
     @Override
     public ItemRateByStudent getItemRateByStudentById(long id) {
-        return this._itemRateByStudentRepository.getOne(id);
+
+        // IMPORTANT: difference between getOne abd findById
+        // https://www.javacodemonk.com/difference-between-getone-and-findbyid-in-spring-data-jpa-3a96c3ff
+        // return this._itemRateByStudentRepository.getOne(id); //throws NestedException if not found
+        return this._itemRateByStudentRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -69,7 +73,7 @@ public class ItemRateByStudentServiceImpl implements ItemRateByStudentService
     public ItemRateByStudent updateItemRateByStudent(long itemRateByStudentId, String justification, int rate, LearningStudent learningStudent, ItemRubric itemRubric,
                                                      LearningStudent targetStudent, UserGroup targetUserGroup) {
 
-        ItemRateByStudent itemRateByStudentUpdatable = this._itemRateByStudentRepository.getOne(itemRateByStudentId);
+        ItemRateByStudent itemRateByStudentUpdatable = this._itemRateByStudentRepository.findById(itemRateByStudentId).orElse(null);
 
         if (itemRateByStudentUpdatable!=null) {
             itemRateByStudentUpdatable.setJustification(justification);

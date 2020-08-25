@@ -1,8 +1,14 @@
 package com.kesizo.cetpe.backend.restapi.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 /**
  *
@@ -11,7 +17,16 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name = "item_rate_by_student")
+@JsonIdentityInfo( //It solves recursive problems with JSON -> https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id",
+        scope = ItemRateByStudent.class // This is needed otherwise if nested JSON objects have the same id it will fails
+)
 public class ItemRateByStudent {
+
+
+    //Logger has to be static otherwise it will considered by JPA as column
+    private static Logger logger = LoggerFactory.getLogger(ItemRateByStudent.class);
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "seq_item_rate_by_student_generator")
@@ -37,11 +52,11 @@ public class ItemRateByStudent {
     private ItemRubric itemRubric;
 
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name="targetStudent_id", nullable = true) //this can be null
     private LearningStudent targetStudent;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name="targetUserGroup_id", nullable = true) //this can be null
     private UserGroup targetUserGroup;
 
@@ -119,14 +134,39 @@ public class ItemRateByStudent {
         String info = "";
 
         JSONObject jsonInfo = new JSONObject();
-        jsonInfo.put("id",this.id);
-        jsonInfo.put("rate",this.rate);
-        jsonInfo.put("justification",this.justification);
-        jsonInfo.put("itemRubric",this.itemRubric);
-        jsonInfo.put("learningStudent",this.learningStudent);
-        jsonInfo.put("targetStudent",this.targetStudent);
+        try {
+            jsonInfo.put("id",this.id);
+            jsonInfo.put("rate",this.rate);
+            jsonInfo.put("justification",this.justification);
+            jsonInfo.put("itemRubric",this.itemRubric);
+            jsonInfo.put("learningStudent",this.learningStudent);
+            jsonInfo.put("targetStudent",this.targetStudent);
+        } catch (JSONException e) {
+            logger.error("Error creating ItemRateByStudent JSON String representation");
+            logger.error(e.getMessage());
+        }
+
         info = jsonInfo.toString();
         return info;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ItemRateByStudent that = (ItemRateByStudent) o;
+        return id == that.id &&
+                rate == that.rate &&
+                justification.equals(that.justification) &&
+                learningStudent.equals(that.learningStudent) &&
+                itemRubric.equals(that.itemRubric) &&
+                Objects.equals(targetStudent, that.targetStudent) &&
+                Objects.equals(targetUserGroup, that.targetUserGroup);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, justification, rate, learningStudent, itemRubric, targetStudent, targetUserGroup);
     }
 }
 

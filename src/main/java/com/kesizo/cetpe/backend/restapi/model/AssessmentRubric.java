@@ -1,18 +1,30 @@
 package com.kesizo.cetpe.backend.restapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "assessment_rubric")
+@JsonIdentityInfo( //It solves recursive problems with JSON -> https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id",
+        scope = AssessmentRubric.class
+)
 public class AssessmentRubric {
+
+    //Logger has to be static otherwise it will considered by JPA as column
+    private static Logger logger = LoggerFactory.getLogger(AssessmentRubric.class);
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "seq_assessment_rubric_generator")
@@ -50,14 +62,9 @@ public class AssessmentRubric {
     @JoinColumn(name="learningProcess_id", nullable=false)
     private LearningProcess learningProcess;
 
-    public void setItemList(List<ItemRubric> itemList) {
-        this.itemList = itemList;
-    }
-
     // This cascade and orphanRemoval means that all children rubrics will be removed when the learning process is removed
-    @OneToMany(mappedBy = "assessmentRubric", cascade = CascadeType.ALL, orphanRemoval = true) // https://www.baeldung.com/delete-with-hibernate
-    @JsonIgnore // https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
-    private List<ItemRubric> itemList;
+    @OneToMany(mappedBy = "assessmentRubric",fetch = FetchType.LAZY,  cascade = CascadeType.ALL, orphanRemoval = true) // https://www.baeldung.com/delete-with-hibernate
+    private List<ItemRubric> item_list;
 
     public AssessmentRubric() {
 
@@ -109,14 +116,27 @@ public class AssessmentRubric {
 
     public void setLearningProcess(LearningProcess learningProcess) { this.learningProcess = learningProcess; }
 
-    public List<ItemRubric> getItemList() { return itemList; }
+    public List<ItemRubric> getItemList() { return item_list; }
 
-    public void addItemRubric(ItemRubric itemRubric){
-        if(this.itemList == null){
-            this.itemList = new ArrayList<>();
-        }
-        this.itemList.add(itemRubric);
+    public void setItemList(List<ItemRubric> item_list) {
+        this.item_list = item_list;
     }
+
+//    public void addItemRubric(ItemRubric itemRubric){
+//        if (this.item_list == null) {
+//            this.item_list = new ArrayList<>();
+//        }
+//        this.item_list.add(itemRubric);
+//    }
+//
+//    public void removeItemList(ItemRubric itemRubric) {
+//        if (this.item_list == null) {
+//            this.item_list = new ArrayList<>();
+//        }
+//        if (this.item_list.contains(itemRubric)) {
+//            this.item_list.remove(itemRubric);
+//        }
+//    }
 
     public boolean isEnabled() {
         return enabled;
@@ -127,21 +147,51 @@ public class AssessmentRubric {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
+
         String info = "";
 
         JSONObject jsonInfo = new JSONObject();
-        jsonInfo.put("id",this.id);
-        jsonInfo.put("title",this.title);
-        jsonInfo.put("starting_date_time",this.starting_date_time);
-        jsonInfo.put("end_date_time",this.end_date_time);
-        jsonInfo.put("rank",this.rank);
-        jsonInfo.put("enabled",this.enabled);
-        jsonInfo.put("rubricType",this.rubricType);
-        jsonInfo.put("learningProcess",this.learningProcess);
+        try {
+            jsonInfo.put("id", this.id);
+            jsonInfo.put("title", this.title);
+            jsonInfo.put("starting_date_time", this.starting_date_time);
+            jsonInfo.put("end_date_time", this.end_date_time);
+            jsonInfo.put("rank", this.rank);
+            jsonInfo.put("enabled", this.enabled);
+            jsonInfo.put("rubricType", this.rubricType);
+            jsonInfo.put("learningProcess", this.learningProcess);
+            jsonInfo.put("item_list", this.item_list);
+
+        } catch (JSONException e) {
+            logger.error("Error creating Rubric JSON String representation");
+            logger.error(e.getMessage());
+        }
 
         info = jsonInfo.toString();
         return info;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AssessmentRubric that = (AssessmentRubric) o;
+        return id == that.id &&
+                rank == that.rank &&
+                enabled == that.enabled &&
+                title.equals(that.title) &&
+                starting_date_time.equals(that.starting_date_time) &&
+                end_date_time.equals(that.end_date_time) &&
+                rubricType.equals(that.rubricType) &&
+                learningProcess.equals(that.learningProcess) &&
+                Objects.equals(item_list, that.item_list);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, starting_date_time, end_date_time, rank, enabled, rubricType, learningProcess, item_list);
+    }
+
 }
 

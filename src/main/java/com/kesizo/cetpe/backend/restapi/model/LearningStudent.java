@@ -3,15 +3,21 @@ package com.kesizo.cetpe.backend.restapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "learning_student")
 public class LearningStudent {
+
+    //Logger has to be static otherwise it will considered by JPA as column
+    private static Logger logger = LoggerFactory.getLogger(LearningStudent.class);
 
     @Id
     @Column(name="username", unique=true, nullable = false, length = 256)
@@ -104,11 +110,29 @@ public class LearningStudent {
             jsonInfo.put("userGroupList",this.userGroupList);
 
         } catch (JSONException e) {
-            e.getStackTrace();
+            logger.error("Error creating Learning Process Student JSON String representation");
+            logger.error(e.getMessage());
         }
+
 
         info = jsonInfo.toString();
         return info;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LearningStudent that = (LearningStudent) o;
+        return username.equals(that.username) &&
+                firstName.equals(that.firstName) &&
+                lastName.equals(that.lastName) &&
+                Objects.equals(userGroupList, that.userGroupList) &&
+                Objects.equals(itemRatesByStudent, that.itemRatesByStudent);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, firstName, lastName, userGroupList, itemRatesByStudent);
+    }
 }

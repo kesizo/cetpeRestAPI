@@ -3,16 +3,22 @@ package com.kesizo.cetpe.backend.restapi.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 @Entity
 @Table(name = "learning_supervisor")
 public class LearningSupervisor {
+
+    //Logger has to be static otherwise it will considered by JPA as column
+    private static Logger logger = LoggerFactory.getLogger(LearningSupervisor.class);
 
 
     @Id
@@ -74,10 +80,26 @@ public class LearningSupervisor {
             jsonInfo.put("firstName",this.firstName);
             jsonInfo.put("lastName",this.lastName);
         } catch (JSONException e) {
-            e.getStackTrace();
+            logger.error("Error creating Learning Process Supervisor JSON String representation");
+            logger.error(e.getMessage());
         }
 
         info = jsonInfo.toString();
         return info;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LearningSupervisor that = (LearningSupervisor) o;
+        return username.equals(that.username) &&
+                firstName.equals(that.firstName) &&
+                lastName.equals(that.lastName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, firstName, lastName);
     }
 }

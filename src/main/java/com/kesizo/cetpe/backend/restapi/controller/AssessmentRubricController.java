@@ -68,8 +68,21 @@ public class AssessmentRubricController {
 
     @RequestMapping(value = "/api/cetpe/rubrics/by/lprocess/{id}", method = RequestMethod.GET)
     public List<AssessmentRubric> rubricsByLearningProcessId(@PathVariable String id){
-        long learningProcessId = Long.parseLong(id);
-        return _assessmentRubricService.getAssessmentRubricsByLearningProcessId(learningProcessId);
+
+        long learningProcessId = 0;
+        try {
+            learningProcessId = Long.parseLong(id);
+        }
+        catch (NumberFormatException nfe) {
+            logger.warn("Error id parameter is not numeric");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error id parameter is not numeric", nfe);
+        }
+        List<AssessmentRubric> rubricList =_assessmentRubricService.getAssessmentRubricsByLearningProcessId(learningProcessId);
+        if (rubricList==null) {
+            throw new ResourceNotFoundException("Rubrics associated to learning process with id= " + id + " not found");
+        }
+        return rubricList;
     }
 
     @PostMapping("/api/cetpe/rubric")

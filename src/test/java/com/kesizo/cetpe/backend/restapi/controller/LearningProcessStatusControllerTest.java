@@ -2,6 +2,7 @@ package com.kesizo.cetpe.backend.restapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,6 +69,20 @@ public class LearningProcessStatusControllerTest {
                 "INSERT INTO learning_process_status(id,name,description) values (2,'CEPTE Process Finished','The Learning process is finished');\n" +
                 "INSERT INTO learning_process_status(id,name,description) values (3,'CEPTE Process results available','The Learning process is finished and results are published');");
     }
+
+    @After
+    public void tearDown() {
+
+        jdbcTemplate.execute("DELETE FROM assessment_rubric;" +
+                "DELETE FROM rel_user_group_learning_student;" +
+                "DELETE FROM user_group;" +
+                "DELETE FROM learning_process;" +
+                "DELETE FROM learning_supervisor;" +
+                "DELETE FROM learning_process_status;" +
+                "DELETE FROM rubric_type;" +
+                "DELETE FROM learning_student;");
+    }
+
 
 
     @Test

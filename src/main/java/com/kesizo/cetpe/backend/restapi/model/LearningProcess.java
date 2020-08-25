@@ -3,6 +3,8 @@ package com.kesizo.cetpe.backend.restapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -15,6 +17,9 @@ import java.util.Set;
 @Entity
 @Table(name = "learning_process")
 public class LearningProcess {
+
+    //Logger has to be static otherwise it will considered by JPA as column
+    private static Logger logger = LoggerFactory.getLogger(LearningProcess.class);
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "seq_learning_process_generator")
@@ -354,10 +359,13 @@ public class LearningProcess {
             jsonInfo.put("learning_process_status",this.learning_process_status);
 
         } catch (JSONException e) {
-            e.getStackTrace();
+            logger.error("Error creating LearningProcess JSON String representation");
+            logger.error(e.getMessage());
         }
 
         info = jsonInfo.toString();
         return info;
     }
+
+
 }

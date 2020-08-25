@@ -2,8 +2,6 @@ package com.kesizo.cetpe.backend.restapi.service;
 
 import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.model.ItemRubric;
-import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
-import com.kesizo.cetpe.backend.restapi.model.RubricType;
 import com.kesizo.cetpe.backend.restapi.repository.AssessmentRubricRepository;
 import com.kesizo.cetpe.backend.restapi.repository.ItemRubricRepository;
 import org.slf4j.Logger;
@@ -11,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +26,11 @@ public class ItemRubricServiceImpl implements ItemRubricService
 
     @Override
     public ItemRubric getItemRubricById(long id) {
-        return this._itemRubricRepository.getOne(id);
+        // IMPORTANT: difference between getOne abd findById
+        // https://www.javacodemonk.com/difference-between-getone-and-findbyid-in-spring-data-jpa-3a96c3ff
+        //return this._learningProcessRepository.getOne(id); //throws NestedException if not found
+        return this._itemRubricRepository.findById(id).orElse(null);
+
     }
 
     @Override

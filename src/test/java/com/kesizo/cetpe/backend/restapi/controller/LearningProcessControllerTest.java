@@ -5,6 +5,7 @@ import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
 import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
 import com.kesizo.cetpe.backend.restapi.model.LearningSupervisor;
 import com.kesizo.cetpe.backend.restapi.model.UserGroup;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //This annotation tells SpringRunner to configure the MockMvc instance that will be used to make our RESTful calls.
 @ActiveProfiles("test")
 public class LearningProcessControllerTest {
+
 
 
     private static final String BASE_URL = "/api/cetpe/lprocess";
@@ -82,6 +84,17 @@ public class LearningProcessControllerTest {
         jdbcTemplate.execute("INSERT INTO learning_supervisor(username, first_name, last_name) VALUES ('user', 'supervisorName', 'supervisorLastName')");
     }
 
+    @After
+    public void tearDown() {
+
+        jdbcTemplate.execute("DELETE FROM assessment_rubric;" +
+                "DELETE FROM user_group;" +
+                "DELETE FROM learning_process;" +
+                "DELETE FROM learning_supervisor;" +
+                "DELETE FROM learning_process_status;" +
+                "DELETE FROM rubric_type;" +
+                "DELETE FROM learning_student;");
+    }
 
     @Test
     public void contextLoads() throws Exception {
@@ -211,6 +224,55 @@ public class LearningProcessControllerTest {
                 .andExpect(jsonPath("$.learning_process_status.id", is(0)))
                 .andReturn();
     }
+
+    /**
+     * Get an existing Learning Process will return the LearningProcess itself
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldGetLearningProcessByID() throws Exception {
+
+        // Creating learning process object using test values
+        String learningProcessTitle = "Test_title";
+        String learningProcessDescription = "Test_description";
+        String learningProcessSupervisorUsername = "user";
+
+        LearningProcess learningProcessObject = new LearningProcess();
+        learningProcessObject.setName(learningProcessTitle);
+        learningProcessObject.setDescription(learningProcessDescription);
+        learningProcessObject.setLearning_supervisor(new LearningSupervisor(learningProcessSupervisorUsername,"firstName","lastName"));
+
+        byte[] learningProcessJSON = this.mapper.writeValueAsString(learningProcessObject).getBytes();
+
+        // INSERT: Operation
+        MvcResult resultInsert = mvc.perform(post(BASE_URL)
+                .content(learningProcessJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)) //here ends invokeCreate
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name", is(learningProcessTitle)))
+                .andExpect(jsonPath("$.description", is(learningProcessDescription)))
+                .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
+                .andReturn();
+
+
+        LearningProcess learningProcessRetrieved = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), LearningProcess.class);
+
+        // GET: Operation Check
+        MvcResult result = mvc.perform(get(BASE_URL+"/"+learningProcessRetrieved.getId())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.name",is(learningProcessTitle)))
+                .andExpect(jsonPath("$.description", is(learningProcessDescription )))
+                .andExpect(jsonPath("$.learning_supervisor.username", is(learningProcessSupervisorUsername)))
+                .andExpect(jsonPath("$.learning_process_status.id", is(0)))
+                .andReturn();
+
+    }
+
+
 
     /**
      * Fail when creating a new Learning Process with null title

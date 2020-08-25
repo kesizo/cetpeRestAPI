@@ -3,15 +3,21 @@ package com.kesizo.cetpe.backend.restapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "user_group")
 public class UserGroup {
+
+    //Logger has to be static otherwise it will considered by JPA as column
+    private static Logger logger = LoggerFactory.getLogger(UserGroup.class);
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "seq_user_group_generator")
@@ -38,7 +44,6 @@ public class UserGroup {
             joinColumns = @JoinColumn(name = "userGroup_id", nullable = false, referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name="learningStudent_id", nullable = false, referencedColumnName = "username")
     ) //https://www.baeldung.com/jpa-many-to-many
-    //@JsonIgnore
     private List<LearningStudent> learningStudentList;
 
     @ManyToOne
@@ -111,10 +116,28 @@ public class UserGroup {
             jsonInfo.put("authorizedStudent",this.authorizedStudent != null ? this.authorizedStudent : null);
 
         } catch (JSONException e) {
-            e.getStackTrace();
+            logger.error("Error creating User Group JSON String representation");
+            logger.error(e.getMessage());
         }
 
         info = jsonInfo.toString();
         return info;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserGroup userGroup = (UserGroup) o;
+        return id == userGroup.id &&
+                name.equals(userGroup.name) &&
+                learningProcess.equals(userGroup.learningProcess) &&
+                Objects.equals(learningStudentList, userGroup.learningStudentList) &&
+                Objects.equals(authorizedStudent, userGroup.authorizedStudent);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, learningProcess, learningStudentList, authorizedStudent);
     }
 }
