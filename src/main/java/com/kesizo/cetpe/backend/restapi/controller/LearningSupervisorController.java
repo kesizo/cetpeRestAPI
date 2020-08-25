@@ -5,7 +5,6 @@ import com.kesizo.cetpe.backend.restapi.service.LearningSupervisorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
@@ -34,9 +33,6 @@ public class LearningSupervisorController {
 
         currentSupervisor = _learningSupervisorService.getLearningSupervisorByUserName(username);
 
-        if (currentSupervisor==null) {
-            throw new ResourceNotFoundException("Supervisor with username= " + username + " not found");
-        }
         return currentSupervisor;
     }
 

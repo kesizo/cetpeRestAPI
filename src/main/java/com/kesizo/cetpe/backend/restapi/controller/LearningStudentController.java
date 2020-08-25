@@ -5,7 +5,6 @@ import com.kesizo.cetpe.backend.restapi.service.LearningStudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
@@ -34,9 +33,6 @@ public class LearningStudentController {
 
         currentStudent = _learningStudentService.getLearningStudentByUserName(username);
 
-        if (currentStudent==null) {
-            throw new ResourceNotFoundException("Student with username= " + username + " not found");
-        }
         return currentStudent;
     }
 

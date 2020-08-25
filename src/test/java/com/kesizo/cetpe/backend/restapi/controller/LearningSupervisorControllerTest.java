@@ -98,7 +98,9 @@ public class LearningSupervisorControllerTest {
 
         mvc.perform(get(BASE_URL + "/xxx")
                 .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").doesNotExist())
+                .andReturn();
     }
 
     @Test
