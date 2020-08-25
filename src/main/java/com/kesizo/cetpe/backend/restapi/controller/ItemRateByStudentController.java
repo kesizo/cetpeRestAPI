@@ -335,9 +335,16 @@ public class ItemRateByStudentController {
         }
     }
 
-    @DeleteMapping("/api/cetpe/lprocess/rubric/item/rate/{id}")
+    @DeleteMapping("/api/cetpe/rate/{id}")
     public boolean delete(@PathVariable String id) {
-        long itemRateId = Long.parseLong(id);
+
+        long itemRateId;
+        try {
+            itemRateId = Long.parseLong(id);
+        } catch (NumberFormatException nfe) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error id parameter is not numeric", nfe);
+        }
 
         return _itemRateService.deleteItemRateByStudent(itemRateId);
 

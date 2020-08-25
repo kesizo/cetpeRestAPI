@@ -776,6 +776,113 @@ public class ItemRateByStudentControllerTest {
     }
 
 
+    /**
+     * Delete an existing Rate will return the deleted Rate
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldDeleteRate() throws Exception {
+
+        ItemRateByStudent rateToUpdate = new ItemRateByStudent();
+        rateToUpdate.setRate(RATE_TEST);
+        rateToUpdate.setJustification(RATE_JUSTIFICATION);
+        rateToUpdate.setLearningStudent(this.getMockTestStudent());
+        rateToUpdate.setTargetStudent(null);
+        rateToUpdate.setTargetUserGroup(this.getMockTestTargetUserGroup());
+        ItemRubric itemParent = getMockExistingTestItemHelper();
+        rateToUpdate.setItemRubric(itemParent);
+
+        //Creating item JSON
+        byte[] rateToUpdateJSON = this.mapper.writeValueAsString(rateToUpdate).getBytes();
+
+        // CREATE THE Rate
+        MvcResult resultInsert = mvc.perform(post(BASE_URL)
+                .content(rateToUpdateJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$.rate", is(RATE_TEST)))
+                .andExpect(jsonPath("$.justification",is(RATE_JUSTIFICATION)))
+                .andReturn();
+
+        ItemRateByStudent rateCreatedToDelete = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), ItemRateByStudent.class);
+
+        // Check that one item is found in the database
+        mvc.perform(get(BASE_URL).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andReturn();
+
+        // Delete: Operation
+        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/"+rateCreatedToDelete.getId())
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$",is(true)))
+                .andReturn();
+
+        // Check that none processes are found in the database
+        mvc.perform(get(BASE_URL).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)))
+                .andReturn();
+
+
+    }
+
+    /**
+     * * Should return not found when asking to delete an rate with a bad id
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldNotFoundDeleteRateByBadID() throws Exception {
+
+        // Delete: Operation
+        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/xxx")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").doesNotExist())
+                .andReturn();
+    }
+
+    @Test
+    public void shouldNotFoundDeleteRateByBadURL() throws Exception {
+
+        // Delete: Operation
+        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"xxx")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").doesNotExist())
+                .andReturn();
+
+    }
+
+
+    /**
+     *
+     * Should get a 200 and false when deleting an Rate by id is not found.
+     *
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldReturnFalseDeleteRateByNonExistingID() throws Exception {
+
+        String sNonExistingId = String.valueOf(0);
+
+        // Delete: Operation
+        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/"+sNonExistingId)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").exists())
+                .andExpect(jsonPath("$",is(false)))
+                .andReturn();
+    }
+
+
     /* ----------------------------------------------------------
      * ------------------ HELPER METHODS ------------------------
      * ----------------------------------------------------------
@@ -875,402 +982,6 @@ public class ItemRateByStudentControllerTest {
 
         return testTargetUserGroup;
     }
-
-//
-//    /**
-//     * Should create an item on Rubric 1 from lprocess with id=1
-//     *
-//     * @throws Exception
-//     */
-//    @Test
-//    public void shouldCreateItem() throws Exception {
-//
-//        String itemRubricDescription = "Test Item 1 Rubric 1";
-//
-//        ItemRubric itemRubricToCreate = new ItemRubric();
-//        itemRubricToCreate.setDescription(itemRubricDescription);
-//        itemRubricToCreate.setWeight(ITEM_WEIGHT_TEST);
-//        itemRubricToCreate.setAssessmentRubric(getRubricFromTestLearningProcess(LEARNING_PROCESS_TEST_ID));
-//  //      itemRubricToCreate.setItemRatesByStudent(null);
-//
-//        //Creating item JSON
-//        byte[] itemRubricToCreateJSON = this.mapper.writeValueAsString(itemRubricToCreate).getBytes();
-//
-//
-//        // CREATE THE ITEM
-//        MvcResult resultInsert = mvc.perform(post(BASE_URL) // It doesn't jump to break point and I don't know why
-//                .content(itemRubricToCreateJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$").exists())
-//                .andExpect(jsonPath("$.description", is(itemRubricDescription)))
-//                .andExpect(jsonPath("$.weight",is(ITEM_WEIGHT_TEST)))
-//                .andReturn();
-//
-//        ItemRubric itemInserted = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), ItemRubric.class);
-//
-//        // CHECK Just inserted ITEM
-//        MvcResult resultsCheck = mvc.perform(get(BASE_URL+"/"+itemInserted.getId())
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").exists())
-//                .andReturn();
-//
-//        // RETRIEVE THE LIST OF ITEMS FROM THE RUBRIC AND CHECK THERE IS ONE
-//        MvcResult resultsInRubricCheck = mvc.perform(get(BASE_URL)
-//                .param("id_rubric", LEARNING_PROCESS_TEST_ID)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$", hasSize(1)))
-//                .andReturn();
-//
-//
-//    }
-//
-//    @Test
-//    public void shouldBadRequestCreateItemNullDescription() throws Exception {
-//
-//        // Creating Item object using test values
-//        String itemDescription = null;
-//        int itemWeight = ITEM_WEIGHT_TEST;
-//        long assessmentRubric_id = ASSESSMENT_RUBRIC_ID_TEST;
-//
-//        ItemRubric itemObject = new ItemRubric();
-//        itemObject.setWeight(itemWeight);
-//        itemObject.setDescription(itemDescription);
-//
-//        itemObject.setAssessmentRubric(getRubricFromTestLearningProcess(ASSESSMENT_RUBRIC_TYPE_ID_TEST));
-//
-//        // Creating process JSON
-//        byte[] itemJSON = this.mapper.writeValueAsString(itemObject).getBytes();
-//
-//        // invoke Create
-//        MvcResult results = mvc.perform(post(BASE_URL).content(itemJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest())
-//                .andReturn();
-//    }
-//
-//
-//    @Test
-//    public void shouldBadRequestCreateItemWeightZero() throws Exception {
-//
-//        // Creating Item object using test values
-//        String itemDescription = "Description Test";
-//        int itemWeight = 0;
-//        long assessmentRubric_id = ASSESSMENT_RUBRIC_ID_TEST;
-//
-//        ItemRubric itemObject = new ItemRubric();
-//
-//        itemObject.setWeight(itemWeight);
-//        itemObject.setDescription(itemDescription);
-//
-//        itemObject.setAssessmentRubric(getRubricFromTestLearningProcess(ASSESSMENT_RUBRIC_TYPE_ID_TEST));
-//
-//        // Creating process JSON
-//        byte[] itemJSON = this.mapper.writeValueAsString(itemObject).getBytes();
-//
-//        // invoke Create
-//        MvcResult results = mvc.perform(post(BASE_URL).content(itemJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest())
-//                .andReturn();
-//    }
-//
-//    @Test
-//    public void shouldBadRequestCreateItemWithAssessmentRubricNull() throws Exception {
-//
-//        // Creating Item object using test values
-//        String itemDescription = "Description Test";
-//        int itemWeight = ITEM_WEIGHT_TEST;
-//
-//
-//        ItemRubric itemObject = new ItemRubric();
-//        itemObject.setDescription(itemDescription);
-//        itemObject.setWeight(itemWeight);
-//        itemObject.setAssessmentRubric(null);
-//
-//        // Creating process JSON
-//        byte[] itemJSON = this.mapper.writeValueAsString(itemObject).getBytes();
-//
-//        // invoke Create
-//        MvcResult results = mvc.perform(post(BASE_URL)
-//                .content(itemJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest())
-//                .andReturn();
-//    }
-//
-//    /**
-//     * Should create an item on Rubric 1 from lprocess with id=1
-//     *
-//     * @throws Exception
-//     */
-//    @Test
-//    public void shouldUpdateItem() throws Exception {
-//
-//        String itemRubricDescription = "Test Item 1 Rubric 1";
-//        ItemRubric itemRubricToCreate = new ItemRubric();
-//        itemRubricToCreate.setDescription(itemRubricDescription);
-//        itemRubricToCreate.setWeight(ITEM_WEIGHT_TEST);
-//        itemRubricToCreate.setAssessmentRubric(getRubricFromTestLearningProcess(LEARNING_PROCESS_TEST_ID));
-//        //      itemRubricToCreate.setItemRatesByStudent(null);
-//
-//        //Creating item JSON
-//        byte[] itemRubricToCreateJSON = this.mapper.writeValueAsString(itemRubricToCreate).getBytes();
-//
-//
-//        // CREATE THE ITEM
-//        MvcResult resultInsert = mvc.perform(post(BASE_URL) // It doesn't jump to break point and I don't know why
-//                .content(itemRubricToCreateJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$").exists())
-//                .andExpect(jsonPath("$.description", is(itemRubricDescription)))
-//                .andExpect(jsonPath("$.weight",is(ITEM_WEIGHT_TEST)))
-//                .andReturn();
-//
-//        ItemRubric itemToUpdate = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), ItemRubric.class);
-//        itemToUpdate.setDescription(itemRubricDescription + "UPDATED");
-//        itemToUpdate.setWeight(ITEM_WEIGHT_TEST + 5);
-//
-//        byte[] itemRubricToUpdateJSON = this.mapper.writeValueAsString(itemToUpdate).getBytes();
-//
-//        // UPDATE: Operation
-//        MvcResult resultUpdate = mvc.perform(put(BASE_URL+"/"+itemToUpdate.getId())
-//                .content(itemRubricToUpdateJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").exists())
-//                .andExpect(jsonPath("$.description", is(itemRubricDescription + "UPDATED")))
-//                .andExpect(jsonPath("$.weight",is(ITEM_WEIGHT_TEST + 5)))
-//                .andReturn();
-//
-//    }
-//
-//    @Test
-//    public void shouldBadRequestUpdateItemNullDescription() throws Exception {
-//
-//        String itemRubricDescription = "Test Item 1 Rubric 1";
-//        ItemRubric itemRubricToCreate = new ItemRubric();
-//        itemRubricToCreate.setDescription(itemRubricDescription);
-//        itemRubricToCreate.setWeight(ITEM_WEIGHT_TEST);
-//        itemRubricToCreate.setAssessmentRubric(getRubricFromTestLearningProcess(LEARNING_PROCESS_TEST_ID));
-//        //      itemRubricToCreate.setItemRatesByStudent(null);
-//
-//        //Creating item JSON
-//        byte[] itemRubricToCreateJSON = this.mapper.writeValueAsString(itemRubricToCreate).getBytes();
-//
-//
-//        // CREATE THE ITEM
-//        MvcResult resultInsert = mvc.perform(post(BASE_URL) // It doesn't jump to break point and I don't know why
-//                .content(itemRubricToCreateJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$").exists())
-//                .andExpect(jsonPath("$.description", is(itemRubricDescription)))
-//                .andExpect(jsonPath("$.weight",is(ITEM_WEIGHT_TEST)))
-//                .andReturn();
-//
-//        ItemRubric itemToUpdate = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), ItemRubric.class);
-//        itemToUpdate.setDescription(null);
-//        itemToUpdate.setWeight(ITEM_WEIGHT_TEST + 5);
-//
-//
-//        byte[] itemRubricToUpdateJSON = this.mapper.writeValueAsString(itemToUpdate).getBytes();
-//
-//        // UPDATE: Operation
-//        MvcResult resultUpdate = mvc.perform(put(BASE_URL+"/"+itemToUpdate.getId())
-//                .content(itemRubricToUpdateJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest())
-//                .andReturn();
-//
-//    }
-//
-//    @Test
-//    public void shouldBadRequestUpdateItemNullRubric() throws Exception {
-//
-//        String itemRubricDescription = "Test Item 1 Rubric 1";
-//        ItemRubric itemRubricToCreate = new ItemRubric();
-//        itemRubricToCreate.setDescription(itemRubricDescription);
-//        itemRubricToCreate.setWeight(ITEM_WEIGHT_TEST);
-//        itemRubricToCreate.setAssessmentRubric(getRubricFromTestLearningProcess(LEARNING_PROCESS_TEST_ID));
-//        //      itemRubricToCreate.setItemRatesByStudent(null);
-//
-//        //Creating item JSON
-//        byte[] itemRubricToCreateJSON = this.mapper.writeValueAsString(itemRubricToCreate).getBytes();
-//
-//
-//        // CREATE THE ITEM
-//        MvcResult resultInsert = mvc.perform(post(BASE_URL) // It doesn't jump to break point and I don't know why
-//                .content(itemRubricToCreateJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$").exists())
-//                .andExpect(jsonPath("$.description", is(itemRubricDescription)))
-//                .andExpect(jsonPath("$.weight",is(ITEM_WEIGHT_TEST)))
-//                .andReturn();
-//
-//        ItemRubric itemToUpdate = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), ItemRubric.class);
-//        itemToUpdate.setAssessmentRubric(null);
-//
-//        byte[] itemRubricToUpdateJSON = this.mapper.writeValueAsString(itemToUpdate).getBytes();
-//
-//        // UPDATE: Operation
-//        MvcResult resultUpdate = mvc.perform(put(BASE_URL+"/"+itemToUpdate.getId())
-//                .content(itemRubricToUpdateJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest())
-//                .andReturn();
-//
-//    }
-//
-//    /**
-//     * Delete an existing Item will return the deleted Item
-//     *
-//     * @throws Exception
-//     */
-//    @Test
-//    public void shouldDeleteItem() throws Exception {
-//
-//        String itemRubricDescription = "Test Item 1 Rubric 1";
-//
-//        ItemRubric itemRubricToCreate = new ItemRubric();
-//        itemRubricToCreate.setDescription(itemRubricDescription);
-//        itemRubricToCreate.setWeight(ITEM_WEIGHT_TEST);
-//        itemRubricToCreate.setAssessmentRubric(getRubricFromTestLearningProcess(LEARNING_PROCESS_TEST_ID));
-//        //      itemRubricToCreate.setItemRatesByStudent(null);
-//
-//        //Creating item JSON
-//        byte[] itemRubricToCreateJSON = this.mapper.writeValueAsString(itemRubricToCreate).getBytes();
-//
-//
-//        // CREATE THE ITEM
-//        MvcResult resultInsert = mvc.perform(post(BASE_URL) // It doesn't jump to break point and I don't know why
-//                .content(itemRubricToCreateJSON)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isCreated())
-//                .andExpect(jsonPath("$").exists())
-//                .andExpect(jsonPath("$.description", is(itemRubricDescription)))
-//                .andExpect(jsonPath("$.weight",is(ITEM_WEIGHT_TEST)))
-//                .andReturn();
-//
-//        ItemRubric itemInserted = this.mapper.readValue(resultInsert.getResponse().getContentAsByteArray(), ItemRubric.class);
-//
-//        // Check that one item is found in the database
-//        mvc.perform(get(BASE_URL).accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$", hasSize(1)))
-//                .andReturn();
-//
-//
-//        // Delete: Operation
-//        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/"+itemInserted.getId())
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").exists())
-//                .andExpect(jsonPath("$",is(true)))
-//                .andReturn();
-//
-//        // Check that none processes are found in the database
-//        mvc.perform(get(BASE_URL).accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$", hasSize(0)))
-//                .andReturn();
-//
-//
-//    }
-//
-//    /**
-//     * * Should return not found when asking to delete an item with a bad id
-//     *
-//     * @throws Exception
-//     */
-//    @Test
-//    public void shouldNotFoundDeleteItemByBadID() throws Exception {
-//
-//        // Delete: Operation
-//        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/xxx")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$").doesNotExist())
-//                .andReturn();
-//    }
-//
-//    @Test
-//    public void shouldNotFoundItemProcessByBadURL() throws Exception {
-//
-//        // Delete: Operation
-//        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"xxx")
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isNotFound())
-//                .andExpect(jsonPath("$").doesNotExist())
-//                .andReturn();
-//
-//    }
-//
-//
-//    /**
-//     *
-//     * Should get a 200 and false when deleting an Item by id is not found.
-//     *
-//     *
-//     * @throws Exception
-//     */
-//    @Test
-//    public void shouldReturnFalseDeleteItemByNonExistingID() throws Exception {
-//
-//        String sNonExistingId = String.valueOf(0);
-//
-//        // Delete: Operation
-//        MvcResult resultDelete = mvc.perform(delete(BASE_URL+"/"+sNonExistingId)
-//                .accept(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").exists())
-//                .andExpect(jsonPath("$",is(false)))
-//                .andReturn();
-//    }
-//
-//
-//    /**
-//     * Auxiliary method
-//     *
-//     * @return
-//     */
-//
-//
-//    private AssessmentRubric getRubricFromTestLearningProcess(String sTypeId) throws Exception {
-//
-//        AssessmentRubric rubricToReturn = null;
-//
-//        MvcResult result = mvc.perform(get(BASE_RUBRICS_BY_LPROCESS_URL)
-//                    .accept(MediaType.APPLICATION_JSON))
-//                    .andExpect(status().isOk())
-//                    .andExpect(jsonPath("$", hasSize(4)))
-//                    .andReturn();
-//
-//            //Convert JSON Result to object
-//            AssessmentRubric[] assessmentList = this.mapper.readValue(result.getResponse().getContentAsString(), AssessmentRubric[].class);
-//
-//            int typeRubricId =  Integer.parseInt(sTypeId);
-//            typeRubricId--;
-//            rubricToReturn = assessmentList[typeRubricId];
-//            rubricToReturn.setItemList(null);
-//
-//        return rubricToReturn;
-//    }
 
 }
 
