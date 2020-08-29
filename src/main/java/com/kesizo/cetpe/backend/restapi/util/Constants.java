@@ -10,5 +10,6 @@ public final class Constants {
 
     public static final String RUBRIC_TITLE_DEFAULT = "Default Title Rubric ";
     public static final int RUBRIC_DEFAULT_RANK = 5;
+    public static final boolean RUBRIC_DEFAULT_ENABLED = true;
 
 }

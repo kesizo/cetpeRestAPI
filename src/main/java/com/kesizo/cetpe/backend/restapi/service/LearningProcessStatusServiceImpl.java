@@ -20,7 +20,10 @@ public class LearningProcessStatusServiceImpl implements LearningProcessStatusSe
 
     @Override
     public LearningProcessStatus getLearningProcessStatusById(long id) {
-        return this._learningProcessStatusRepository.getOne(id);
+        // IMPORTANT: difference between getOne abd findById
+        // https://www.javacodemonk.com/difference-between-getone-and-findbyid-in-spring-data-jpa-3a96c3ff
+        //return this._learningProcessStatusRepository.getOne(id);
+        return this._learningProcessStatusRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -31,7 +34,9 @@ public class LearningProcessStatusServiceImpl implements LearningProcessStatusSe
     @Override
     public LearningProcessStatus updateLearningProcessStatus(long learningProcessStatusId, String name, String definition) {
 
-        LearningProcessStatus lpsUpdatable = this._learningProcessStatusRepository.getOne(learningProcessStatusId);
+        // IMPORTANT: difference between getOne abd findById
+        // https://www.javacodemonk.com/difference-between-getone-and-findbyid-in-spring-data-jpa-3a96c3ff
+        LearningProcessStatus lpsUpdatable = this._learningProcessStatusRepository.findById(learningProcessStatusId).orElse(null);
 
         if (lpsUpdatable!=null) {
             lpsUpdatable.setName(name);
@@ -52,14 +57,4 @@ public class LearningProcessStatusServiceImpl implements LearningProcessStatusSe
         }
         return isDeleted;
     }
-
-      /*
-    @Override
-    public LearningProcessStatus createLearningProcessStatusStatus(String name, String definition) {
-        LearningProcessStatus newLearningProcessStatus = new LearningProcessStatus();
-        newLearningProcessStatus.setName(name);
-        newLearningProcessStatus.setDescription(definition);
-        newLearningProcessStatus = this._learningProcessStatusRepository.save(newLearningProcessStatus);
-        return newLearningProcessStatus;
-    }*/
 }

@@ -2,15 +2,12 @@ package com.kesizo.cetpe.backend.restapi.service;
 
 import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
-import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
 import com.kesizo.cetpe.backend.restapi.model.RubricType;
 import com.kesizo.cetpe.backend.restapi.repository.AssessmentRubricRepository;
-import com.kesizo.cetpe.backend.restapi.repository.LearningProcessRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,7 +23,11 @@ public class AssessmentRubricServiceImpl implements AssessmentRubricService
 
     @Override
     public AssessmentRubric getAssessmentRubricById(long id) {
-        return this._assessmentRubricRepository.getOne(id);
+        // IMPORTANT: difference between getOne abd findById
+        // https://www.javacodemonk.com/difference-between-getone-and-findbyid-in-spring-data-jpa-3a96c3ff
+        //return this._learningProcessRepository.getOne(id); //throws NestedException if not found
+        return this._assessmentRubricRepository.findById(id).orElse(null);
+
     }
 
     @Override
@@ -35,7 +36,12 @@ public class AssessmentRubricServiceImpl implements AssessmentRubricService
     }
 
     @Override
-    public AssessmentRubric createAssessmentRubric(String title, LocalDateTime starting_date_time, LocalDateTime end_date_time, int rank, RubricType rubricType, LearningProcess learningProcess) {
+    public List<AssessmentRubric> getAssessmentRubricsByLearningProcessId(long learningProcess_id) {
+        return this._assessmentRubricRepository.findByLearningProcess_id(learningProcess_id);
+    }
+
+    @Override
+    public AssessmentRubric createAssessmentRubric(String title, LocalDateTime starting_date_time, LocalDateTime end_date_time, int rank, boolean enabled, RubricType rubricType, LearningProcess learningProcess) {
 
         AssessmentRubric newAssessmentRubric = new AssessmentRubric();
 
@@ -43,6 +49,7 @@ public class AssessmentRubricServiceImpl implements AssessmentRubricService
         newAssessmentRubric.setStarting_date_time(starting_date_time);
         newAssessmentRubric.setEnd_date_time(end_date_time);
         newAssessmentRubric.setRank(rank);
+        newAssessmentRubric.setEnabled(enabled);
         newAssessmentRubric.setRubricType(rubricType);
         newAssessmentRubric.setLearningProcess(learningProcess);
 
@@ -51,7 +58,7 @@ public class AssessmentRubricServiceImpl implements AssessmentRubricService
     }
 
     @Override
-    public AssessmentRubric updateAssessmentRubric(long assessmentRubricId, String title, LocalDateTime starting_date_time, LocalDateTime end_date_time, int rank, RubricType rubricType, LearningProcess learningProcess) {
+    public AssessmentRubric updateAssessmentRubric(long assessmentRubricId, String title, LocalDateTime starting_date_time, LocalDateTime end_date_time, int rank, boolean enabled, RubricType rubricType, LearningProcess learningProcess) {
 
         AssessmentRubric assessmentUpdatable = this._assessmentRubricRepository.getOne(assessmentRubricId);
 
@@ -60,6 +67,7 @@ public class AssessmentRubricServiceImpl implements AssessmentRubricService
             assessmentUpdatable.setStarting_date_time(starting_date_time);
             assessmentUpdatable.setEnd_date_time(end_date_time);
             assessmentUpdatable.setRank(rank);
+            assessmentUpdatable.setEnabled(enabled);
             assessmentUpdatable.setRubricType(rubricType);
             assessmentUpdatable.setLearningProcess(learningProcess);
             assessmentUpdatable = this._assessmentRubricRepository.save(assessmentUpdatable);

@@ -1,25 +1,31 @@
 package com.kesizo.cetpe.backend.restapi.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
+import com.kesizo.cetpe.backend.restapi.model.RubricType;
 import com.kesizo.cetpe.backend.restapi.service.AssessmentRubricService;
 import com.kesizo.cetpe.backend.restapi.service.LearningProcessService;
-import com.kesizo.cetpe.backend.restapi.service.LearningProcessStatusService;
 import com.kesizo.cetpe.backend.restapi.service.RubricTypeService;
-import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
-import static com.kesizo.cetpe.backend.restapi.util.Constants.DATE_FORMATTER;
-
 @RestController
 public class AssessmentRubricController {
+
+    private Logger logger = LoggerFactory.getLogger(AssessmentRubricController.class);
 
     @Autowired
     private LearningProcessService _learningProcessService;
@@ -30,61 +36,166 @@ public class AssessmentRubricController {
     @Autowired
     private RubricTypeService _rubricTypeService;
 
-    @RequestMapping(value = "/api/cetpe/lprocess/rubric", method = RequestMethod.GET)
+    @Autowired
+    private ObjectMapper mapper; // Used to convert Objects to/from JSON
+
+
+
+    @RequestMapping(value = "/api/cetpe/rubric", method = RequestMethod.GET)
     public List<AssessmentRubric> assessmentRubricIndex(){
 
         return _assessmentRubricService.getAllAssessmentRubrics();
     }
 
-    @RequestMapping(value = "/api/cetpe/lprocess/rubric/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/cetpe/rubric/{id}", method = RequestMethod.GET)
     public AssessmentRubric assessmentRubricById(@PathVariable String id){
-        long assessmentRubricId = Long.parseLong(id);
-        return _assessmentRubricService.getAssessmentRubricById(assessmentRubricId);
+        long assessmentRubricId = 0;
+        try {
+            assessmentRubricId = Long.parseLong(id);
+        }
+        catch (NumberFormatException nfe) {
+            logger.warn("Error id parameter is not numeric");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error id parameter is not numeric", nfe);
+        }
+
+        AssessmentRubric currentRubric = _assessmentRubricService.getAssessmentRubricById(assessmentRubricId);
+        if (currentRubric==null) {
+            throw new ResourceNotFoundException("Rubric with id= " + id + " not found");
+        }
+        return currentRubric;
     }
 
+    @RequestMapping(value = "/api/cetpe/rubrics/by/lprocess/{id}", method = RequestMethod.GET)
+    public List<AssessmentRubric> rubricsByLearningProcessId(@PathVariable String id){
 
-    @PostMapping("/api/cetpe/lprocess/rubric")
-    public AssessmentRubric create(@RequestBody Map<String, String> body) {
-
-        String title = body.get("title");
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMATTER);
-        LocalDateTime starting_date_time = LocalDateTime.parse(body.get("starting_date_time"), formatter);
-        LocalDateTime end_date_time = LocalDateTime.parse(body.get("end_date_time"), formatter);
-        int rank = Integer.parseInt(body.get("rank"));
-
-        long rubricType_id = Long.parseLong(body.get("rubricType_id"));
-        long learningProcess_id = Long.parseLong(body.get("learningProcess_id"));
-
-        return _assessmentRubricService.createAssessmentRubric(title, starting_date_time,
-                                                                end_date_time, rank,
-                                                                _rubricTypeService.getRubricTypeById(rubricType_id),
-                                                                _learningProcessService.getLearningProcessById(learningProcess_id));
+        long learningProcessId = 0;
+        try {
+            learningProcessId = Long.parseLong(id);
+        }
+        catch (NumberFormatException nfe) {
+            logger.warn("Error id parameter is not numeric");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error id parameter is not numeric", nfe);
+        }
+        List<AssessmentRubric> rubricList =_assessmentRubricService.getAssessmentRubricsByLearningProcessId(learningProcessId);
+        if (rubricList==null) {
+            throw new ResourceNotFoundException("Rubrics associated to learning process with id= " + id + " not found");
+        }
+        return rubricList;
     }
 
-    @PutMapping("/api/cetpe/lprocess/rubric/{id}")
-    public AssessmentRubric update(@PathVariable String id, @RequestBody Map<String, String> body) {
+    @PostMapping("/api/cetpe/rubric")
+    @ResponseStatus(HttpStatus.CREATED) // Otherwise it returns 200 because is the default code for @RestController
+    public AssessmentRubric create(@RequestBody Map<String, Object> body) {
 
-        long assessmentRubricId = Long.parseLong(id);
-        String title = body.get("title");
+        try {
+            String title = body.get("title").toString();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMATTER);
-        LocalDateTime starting_date_time = LocalDateTime.parse(body.get("starting_date_time"), formatter);
-        LocalDateTime end_date_time = LocalDateTime.parse(body.get("end_date_time"), formatter);
-        int rank = Integer.parseInt(body.get("rank"));
+            LocalDateTime starting_date_time = LocalDateTime.parse(body.get("starting_date_time").toString());
+            LocalDateTime end_date_time = LocalDateTime.parse(body.get("end_date_time").toString());
 
-        long rubricType_id = Long.parseLong(body.get("rubricType_id"));
-        long learningProcess_id = Long.parseLong(body.get("learningProcess_id"));
+            int rank = Integer.parseInt(body.get("rank").toString());
+            boolean enabled = Boolean.parseBoolean(body.get("enabled").toString());
 
-        return _assessmentRubricService.updateAssessmentRubric(assessmentRubricId, title, starting_date_time,
-                end_date_time, rank,
-                _rubricTypeService.getRubricTypeById(rubricType_id),
-                _learningProcessService.getLearningProcessById(learningProcess_id));
+            Object rubricType = body.get("rubricType");
+            Object learningProcess = body.get("learningProcess");
 
+            String rubricTypeJSON= null;
+            String learningProcessJSON = null;
+
+            RubricType rubricTypeObject = null;
+            LearningProcess learningProcessObject = null;
+
+            try {
+                rubricTypeJSON = mapper.writeValueAsString(rubricType);
+                rubricTypeObject = mapper.readValue(rubricTypeJSON, RubricType.class);
+
+                learningProcessJSON = mapper.writeValueAsString(learningProcess);
+                learningProcessObject = mapper.readValue(learningProcessJSON, LearningProcess.class);
+
+            } catch (JsonProcessingException e) {
+                logger.warn("Error when converting passed mandatory parameter to JSON provided when creating rubric");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided when creating rubric", e);
+            } catch (IOException e) {
+                logger.warn("Error when converting JSON parameter to model object when creating rubric");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object when creating rubric", e);
+            }
+
+            return _assessmentRubricService.createAssessmentRubric(title, starting_date_time,
+                                                                end_date_time, rank, enabled,
+                                                                _rubricTypeService.getRubricTypeById(rubricTypeObject != null ? rubricTypeObject.getId() : null ),
+                                                                _learningProcessService.getLearningProcessById(learningProcessObject != null ? learningProcessObject.getId() : null ));
+        } catch (NullPointerException np) {
+            logger.warn("Error mandatory parameter null provided when creating Assessment Rubric ");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error mandatory parameter null provided when creating Assessment Rubric", np);
+        } catch (TransactionSystemException cve) {
+            logger.warn(cve.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error Bean Validation failed", cve);
+        }
+    }
+
+    @PutMapping("/api/cetpe/rubric/{id}")
+    public AssessmentRubric update(@PathVariable String id, @RequestBody Map<String, Object> body) {
+
+        try {
+            long assessmentRubricId = Long.parseLong(id);
+            String title = body.get("title").toString();
+
+            LocalDateTime starting_date_time = LocalDateTime.parse(body.get("starting_date_time").toString());
+            LocalDateTime end_date_time = LocalDateTime.parse(body.get("end_date_time").toString());
+
+            int rank = Integer.parseInt(body.get("rank").toString());
+            boolean enabled = Boolean.parseBoolean(body.get("enabled").toString());
+
+            Object rubricType = body.get("rubricType");
+            Object learningProcess = body.get("learningProcess");
+
+            String rubricTypeJSON = null;
+            String learningProcessJSON = null;
+
+            RubricType rubricTypeObject = null;
+            LearningProcess learningProcessObject = null;
+
+            try {
+                rubricTypeJSON = mapper.writeValueAsString(rubricType);
+                rubricTypeObject = mapper.readValue(rubricTypeJSON, RubricType.class);
+
+                learningProcessJSON = mapper.writeValueAsString(learningProcess);
+                learningProcessObject = mapper.readValue(learningProcessJSON, LearningProcess.class);
+
+            } catch (JsonProcessingException e) {
+                logger.warn("Error when converting passed mandatory parameter to JSON provided when updating rubric");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Error when converting passed mandatory parameter to JSON provided when updating rubric", e);
+            } catch (IOException e) {
+                logger.warn("Error when converting JSON parameter to model object when updating rubric");
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST, "Error when converting JSON parameter to model object when updating rubric", e);
+            }
+
+            return _assessmentRubricService.updateAssessmentRubric(assessmentRubricId, title, starting_date_time,
+                    end_date_time, rank, enabled,
+                    _rubricTypeService.getRubricTypeById(rubricTypeObject != null ? rubricTypeObject.getId() : null),
+                    _learningProcessService.getLearningProcessById(learningProcessObject != null ? learningProcessObject.getId() : null));
+
+        } catch (NullPointerException np) {
+            logger.warn("Error mandatory parameter null provided when updating Assessment Rubric ");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error mandatory parameter null provided when updating Assessment Rubric", np);
+        } catch (TransactionSystemException cve) {
+            logger.warn(cve.getMessage());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Error Bean Validation failed", cve);
+        }
 
     }
 
-    @DeleteMapping("/api/cetpe/lprocess/rubric/{id}")
+    @DeleteMapping("/api/cetpe/rubric/{id}")
     public boolean delete(@PathVariable String id) {
         long assessmentRubricId = Long.parseLong(id);
 

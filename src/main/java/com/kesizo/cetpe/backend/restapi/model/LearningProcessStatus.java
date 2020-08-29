@@ -2,14 +2,23 @@ package com.kesizo.cetpe.backend.restapi.model;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.Size;
+import java.util.Objects;
 
 
 @Entity
 @Table(name = "learning_process_status")
 public class LearningProcessStatus {
+
+    //Logger has to be static otherwise it will considered by JPA as column
+    private static Logger logger = LoggerFactory.getLogger(LearningProcessStatus.class);
 
     @Id
     private long id;
@@ -61,10 +70,26 @@ public class LearningProcessStatus {
             jsonInfo.put("name",this.name);
             jsonInfo.put("description",this.description);
         } catch (JSONException e) {
-            e.getStackTrace();
+            logger.error("Error creating Learning Process Status JSON String representation");
+            logger.error(e.getMessage());
         }
 
         info = jsonInfo.toString();
         return info;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LearningProcessStatus that = (LearningProcessStatus) o;
+        return id == that.id &&
+                name.equals(that.name) &&
+                description.equals(that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description);
     }
 }

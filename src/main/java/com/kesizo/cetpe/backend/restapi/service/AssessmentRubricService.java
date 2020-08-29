@@ -5,7 +5,6 @@ import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
 import com.kesizo.cetpe.backend.restapi.model.RubricType;
 
-import javax.validation.constraints.Min;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,10 +14,13 @@ public interface AssessmentRubricService {
 
     List<AssessmentRubric> getAllAssessmentRubrics();
 
+    List<AssessmentRubric> getAssessmentRubricsByLearningProcessId(long learningProcess_id);
+
     AssessmentRubric createAssessmentRubric(String title,
                                             LocalDateTime starting_date_time,
                                             LocalDateTime end_date_time,
                                             int rank,
+                                            boolean enable,
                                             RubricType rubricType,
                                             LearningProcess learningProcess);
 
@@ -27,6 +29,7 @@ public interface AssessmentRubricService {
                                            LocalDateTime starting_date_time,
                                            LocalDateTime end_date_time,
                                            int rank,
+                                           boolean enable,
                                            RubricType rubricType,
                                            LearningProcess learningProcess);
 

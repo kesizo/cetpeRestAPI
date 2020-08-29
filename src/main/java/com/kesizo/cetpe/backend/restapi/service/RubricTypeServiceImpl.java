@@ -1,8 +1,6 @@
 package com.kesizo.cetpe.backend.restapi.service;
 
-import com.kesizo.cetpe.backend.restapi.model.LearningProcessStatus;
 import com.kesizo.cetpe.backend.restapi.model.RubricType;
-import com.kesizo.cetpe.backend.restapi.repository.LearningProcessStatusRepository;
 import com.kesizo.cetpe.backend.restapi.repository.RubricTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +21,15 @@ public class RubricTypeServiceImpl implements RubricTypeService {
 
     @Override
     public RubricType getRubricTypeById(long id) {
-        return this._rubricTypeRepositoryRepository.getOne(id);
+
+        RubricType rbFound = null;
+
+            // IMPORTANT: difference between getOne abd findById
+            // https://www.javacodemonk.com/difference-between-getone-and-findbyid-in-spring-data-jpa-3a96c3ff
+            rbFound = this._rubricTypeRepositoryRepository.findById(id).orElse(null);
+            //   rbFound = this._rubricTypeRepositoryRepository.getOne(id);
+
+        return  rbFound;
     }
 
     @Override
@@ -33,7 +39,7 @@ public class RubricTypeServiceImpl implements RubricTypeService {
 
     @Override
     public RubricType updateRubricType(long rubricTypeId, String type) {
-        RubricType rtUpdatable = this._rubricTypeRepositoryRepository.getOne(rubricTypeId);
+        RubricType rtUpdatable = this._rubricTypeRepositoryRepository.findById(rubricTypeId).orElse(null);
 
         if (rtUpdatable!=null) {
             rtUpdatable.setType(type);

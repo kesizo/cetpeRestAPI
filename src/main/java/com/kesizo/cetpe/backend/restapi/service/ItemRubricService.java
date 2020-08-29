@@ -3,10 +3,7 @@ package com.kesizo.cetpe.backend.restapi.service;
 
 import com.kesizo.cetpe.backend.restapi.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.model.ItemRubric;
-import com.kesizo.cetpe.backend.restapi.model.LearningProcess;
-import com.kesizo.cetpe.backend.restapi.model.RubricType;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ItemRubricService {
@@ -21,12 +18,12 @@ public interface ItemRubricService {
 
     ItemRubric createItemRubric(String goal_description,
                                  int weight,
-                                 AssessmentRubric assessmentRubric_id);
+                                 AssessmentRubric assessmentRubric);
 
     ItemRubric updateItemRubric(long itemRubricsId,
                                  String goal_description,
                                  int weight,
-                                 AssessmentRubric assessmentRubric_id);
+                                 AssessmentRubric assessmentRubric);
 
     boolean deleteItemRubric(long itemRubricId);
 }

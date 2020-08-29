@@ -3,15 +3,23 @@ package com.kesizo.cetpe.backend.restapi.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "learning_process")
 public class LearningProcess {
+
+    //Logger has to be static otherwise it will considered by JPA as column
+    private static Logger logger = LoggerFactory.getLogger(LearningProcess.class);
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "seq_learning_process_generator")
@@ -25,7 +33,7 @@ public class LearningProcess {
     @Size(min = 3, max = 256) // it requires to have at least 3 characters
     private String name;
 
-    @Column(name = "description", nullable = false, length = 256)
+    @Column(name = "description", nullable = false, length = 1024)
     @Size(min = 1, max = 1024)
     private String description;
 
@@ -79,10 +87,17 @@ public class LearningProcess {
     @JsonIgnore // https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
     private Set<AssessmentRubric> rubricSet;
 
+    @OneToMany(mappedBy = "learningProcess", cascade = CascadeType.ALL, orphanRemoval = true) // https://www.baeldung.com/delete-with-hibernate
+    @JsonIgnore // https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
+    private List<UserGroup> user_group_list;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supervisor_id")
+    private LearningSupervisor learning_supervisor;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
-    private LearningProcessStatus status;
-
+    private LearningProcessStatus learning_process_status;
 
     public LearningProcess(long id, @Size(min = 3, max = 256) String name,
                            @Size(min = 1, max = 1024) String description,
@@ -99,6 +114,7 @@ public class LearningProcess {
                            int weight_param_C,
                            int weight_param_D,
                            int weight_param_E,
+                           LearningSupervisor supervisor,
                            LearningProcessStatus status) {
         this.id = id;
         this.name = name;
@@ -118,7 +134,8 @@ public class LearningProcess {
         this.weight_param_C = weight_param_C;
         this.weight_param_D = weight_param_D;
         this.weight_param_E = weight_param_E;
-        this.status = status;
+        this.learning_supervisor = supervisor;
+        this.learning_process_status = status;
     }
 
     public LearningProcess() { }
@@ -265,13 +282,53 @@ public class LearningProcess {
         this.weight_param_E = weight_param_E;
     }
 
-    public LearningProcessStatus getStatus() { return status; }
+    public LearningSupervisor getLearning_supervisor() {
+        return learning_supervisor;
+    }
 
-    public void setStatus(LearningProcessStatus status) { this.status = status; }
+    public void setLearning_supervisor(LearningSupervisor learning_supervisor) {
+        this.learning_supervisor = learning_supervisor;
+    }
+
+    public LearningProcessStatus getLearning_process_status() {
+        return learning_process_status;
+    }
+
+    public void setLearning_process_status(LearningProcessStatus learning_process_status) {
+        this.learning_process_status = learning_process_status;
+    }
+
+    public void setUserGroupList(List<UserGroup> user_group_list) {
+        this.user_group_list = user_group_list;
+    }
+
+    public List<UserGroup> getUserGroupList() { return user_group_list; }
+
+    public void addUserGroup(UserGroup userGroup) {
+        if (this.user_group_list == null) {
+            this.user_group_list = new ArrayList<>();
+        }
+        this.user_group_list.add(userGroup);
+    }
+
+    public void removeUserGroup(UserGroup userGroup) {
+        if (this.user_group_list == null) {
+            this.user_group_list = new ArrayList<>();
+        }
+        if (this.user_group_list.contains(userGroup)) {
+            this.user_group_list.remove(userGroup);
+        }
+    }
 
     public Set<AssessmentRubric> getRubricSet() { return rubricSet; }
 
-    public void setRubricSet(Set<AssessmentRubric> rubricSet) { this.rubricSet = rubricSet; }
+    public void addRubric(AssessmentRubric rubric) {
+        if (this.rubricSet == null) {
+            this.rubricSet = new HashSet<>();
+        }
+        this.rubricSet.add(rubric);
+    }
+
 
     @Override
     public String toString(){
@@ -297,13 +354,18 @@ public class LearningProcess {
             jsonInfo.put("weight_param_C",this.weight_param_C);
             jsonInfo.put("weight_param_D",this.weight_param_D);
             jsonInfo.put("weight_param_E",this.weight_param_E);
-            jsonInfo.put("status",this.status);
+            jsonInfo.put("user_group_list", this.user_group_list);
+            jsonInfo.put("learning_supervisor",this.learning_supervisor);
+            jsonInfo.put("learning_process_status",this.learning_process_status);
 
         } catch (JSONException e) {
-            e.getStackTrace();
+            logger.error("Error creating LearningProcess JSON String representation");
+            logger.error(e.getMessage());
         }
 
         info = jsonInfo.toString();
         return info;
     }
+
+
 }
