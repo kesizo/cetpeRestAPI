@@ -11,6 +11,11 @@ INSERT INTO rubric_type(id,type) values (4,'Group members Assessment');
 --INSERT INTO cetpe_user(id,name,password) values (10,'Miguel','borrascas');
 --INSERT INTO cetpe_user(id,name,password) values (11,'Hilda','Hilda');
 
+INSERT INTO roles(name) VALUES('ROLE_USER');
+INSERT INTO roles(name) VALUES('ROLE_PM');
+INSERT INTO roles(name) VALUES('ROLE_ADMIN');
+
+
 INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent1', 'CRISTIAN', 'PERDIGUERO LOZANO');
 INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent2', 'LAURA', 'PEREA LEÓN');
 INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent3', 'JOSÉ MANUEL', 'PÉREZ ROMANA');

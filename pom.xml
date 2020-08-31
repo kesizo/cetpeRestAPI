@@ -36,6 +36,7 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.2.5</version>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- UNIT TEST database https://mvnrepository.com/artifact/org.hsqldb/hsqldb/2.5.0 -->
@@ -53,12 +54,17 @@
             <version>20190722</version>
         </dependency>
 
-
-
-        <!-- Adding Spring Security dependency <dependency>
+        <!-- Adding Spring Security dependency -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>-->
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.0</version>
+        </dependency>
 
         <!-- SWAGGER to document the api both via JSON and via UI  -->
         <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
