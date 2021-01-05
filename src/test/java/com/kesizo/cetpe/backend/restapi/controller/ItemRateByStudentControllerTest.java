@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 //This annotation tells SpringRunner to configure the MockMvc instance that will be used to make our RESTful calls.
 @ActiveProfiles("test")
+@WithMockUser(username="user",roles={"USER"})
 public class ItemRateByStudentControllerTest {
 
 
@@ -143,6 +145,7 @@ public class ItemRateByStudentControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
     public void shouldStartWithNoRates() throws Exception {
 
         MvcResult result = mvc.perform(get(BASE_URL)
@@ -283,16 +286,10 @@ public class ItemRateByStudentControllerTest {
                 .andExpect(jsonPath("$").exists())
                 .andReturn();
 
-        // RETRIEVE THE LIST OF ITEMS FROM THE RUBRIC AND CHECK THERE IS ONE
-        MvcResult resultsInRubricCheck = mvc.perform(get(BASE_URL)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andReturn();
-
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // Needed to support the getMock Methods
     public void shouldCreateRateUserGroupTarget() throws Exception {
 
         ItemRateByStudent rateToCreate = new ItemRateByStudent();
@@ -327,13 +324,6 @@ public class ItemRateByStudentControllerTest {
                 .andExpect(jsonPath("$").exists())
                 .andReturn();
 
-        // RETRIEVE THE LIST OF ITEMS FROM THE RUBRIC AND CHECK THERE IS ONE
-        MvcResult resultsInRubricCheck = mvc.perform(get(BASE_URL)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andReturn();
-
     }
 
     @Test
@@ -360,17 +350,10 @@ public class ItemRateByStudentControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$").doesNotExist())
                 .andReturn();
-
-        // RETRIEVE THE LIST OF ITEMS FROM THE RUBRIC AND CHECK THERE IS ONE
-        MvcResult resultsInRubricCheck = mvc.perform(get(BASE_URL)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)))
-                .andReturn();
-
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // Needed to support the getMock Methods
     public void shouldBadRequestCreateRateWhenNoneTargetsAreNull() throws Exception {
 
         ItemRateByStudent rateToCreate = new ItemRateByStudent();
@@ -397,16 +380,10 @@ public class ItemRateByStudentControllerTest {
                 .andExpect(jsonPath("$").doesNotExist())
                 .andReturn();
 
-        // RETRIEVE THE LIST OF ITEMS FROM THE RUBRIC AND CHECK THERE IS ONE
-        MvcResult resultsInRubricCheck = mvc.perform(get(BASE_URL)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)))
-                .andReturn();
-
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // Needed to support the getMock Methods
     public void shouldBadRequestCreateRateNullJustification() throws Exception {
 
 
@@ -431,16 +408,12 @@ public class ItemRateByStudentControllerTest {
                 .andExpect(jsonPath("$").doesNotExist())
                 .andReturn();
 
-        // RETRIEVE THE LIST OF ITEMS FROM THE RUBRIC AND CHECK THERE IS ONE
-        MvcResult resultsInRubricCheck = mvc.perform(get(BASE_URL)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)))
-                .andReturn();
+
 
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // because it need it for the mock
     public void shouldBadRequestCreateRateNegativeRate() throws Exception {
 
 
@@ -465,12 +438,6 @@ public class ItemRateByStudentControllerTest {
                 .andExpect(jsonPath("$").doesNotExist())
                 .andReturn();
 
-        // RETRIEVE THE LIST OF ITEMS FROM THE RUBRIC AND CHECK THERE IS ONE
-        MvcResult resultsInRubricCheck = mvc.perform(get(BASE_URL)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)))
-                .andReturn();
 
     }
 
@@ -499,17 +466,12 @@ public class ItemRateByStudentControllerTest {
                 .andExpect(jsonPath("$").doesNotExist())
                 .andReturn();
 
-        // RETRIEVE THE LIST OF ITEMS FROM THE RUBRIC AND CHECK THERE IS ONE
-        MvcResult resultsInRubricCheck = mvc.perform(get(BASE_URL)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)))
-                .andReturn();
 
     }
 
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // Needed to support the getMock Methods
     public void shouldUpdateRateJustificationAndRate() throws Exception {
 
 
@@ -556,6 +518,7 @@ public class ItemRateByStudentControllerTest {
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // Needed to support the getMock Methods
     public void shouldBadRequestUpdateRateJustificationNull() throws Exception {
 
 
@@ -600,6 +563,7 @@ public class ItemRateByStudentControllerTest {
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // Needed to support the getMock Methods
     public void shouldBadRequestUpdateRateWithHigherThanRubricRank() throws Exception {
 
 
@@ -644,6 +608,7 @@ public class ItemRateByStudentControllerTest {
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // Needed to support the getMock Methods
     public void shouldBadRequestUpdateRateWithNegativeRate() throws Exception {
 
 
@@ -688,8 +653,8 @@ public class ItemRateByStudentControllerTest {
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"USER","ADMIN"}) // because this.getMockTestTargetUserGroup needs to be USER and ADMIN to create the user group
     public void shouldBadRequestUpdateRateBothTargetsAreNull() throws Exception {
-
 
         ItemRateByStudent rateToUpdate = new ItemRateByStudent();
         rateToUpdate.setRate(RATE_TEST);
@@ -732,6 +697,7 @@ public class ItemRateByStudentControllerTest {
     }
 
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // Needed to support the getMock Methods
     public void shouldBadRequestUpdateRateBothTargetsAreNotNull() throws Exception {
 
 
@@ -782,6 +748,7 @@ public class ItemRateByStudentControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"}) // Needed to support the getMock Methods
     public void shouldDeleteRate() throws Exception {
 
         ItemRateByStudent rateToUpdate = new ItemRateByStudent();
@@ -940,6 +907,7 @@ public class ItemRateByStudentControllerTest {
         return testStudent;
     }
 
+    @WithMockUser
     private UserGroup getMockTestTargetUserGroup() throws Exception {
 
 

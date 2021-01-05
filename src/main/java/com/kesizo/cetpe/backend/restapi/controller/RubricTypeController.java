@@ -6,6 +6,7 @@ import com.kesizo.cetpe.backend.restapi.service.RubricTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,12 +19,14 @@ public class RubricTypeController {
     private RubricTypeService rubricTypeService;
 
     @RequestMapping(value = "/api/cetpe/rubric/types", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM')or hasRole('ADMIN')")
     public List<RubricType> cetpeRubricTypesIndex(){
         return rubricTypeService.getAllRubricTypes();
     }
 
-    //Operations with the blogs. Retrieve (GET), Update (PUT), Remove (DELETE)
+
     @GetMapping("/api/cetpe/rubric/types/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('PM')or hasRole('ADMIN')")
     public RubricType rubricTypeById(@PathVariable String id){
 
         long rubricTypeId;

@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -39,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 //This annotation tells SpringRunner to configure the MockMvc instance that will be used to make our RESTful calls.
 @ActiveProfiles("test")
+@WithMockUser(username="user",roles={"USER","PM"})
 public class LearningSupervisorControllerTest {
 
 
@@ -104,6 +106,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldCreateSupervisor() throws Exception {
 
         // Creating Supervisor object using test values
@@ -134,6 +137,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldCreateSupervisorWithUsernameLengthEquals3() throws Exception {
 
         // Creating Supervisor object using test values
@@ -164,6 +168,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldCreateSupervisorWhenUsernameLengthEquals256() throws Exception {
 
         // Creating Supervisor object using test values
@@ -195,6 +200,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldBadRequestCreateSupervisorWhenUsernameIsNull() throws Exception {
 
         // Creating Supervisor object using test values
@@ -217,6 +223,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldBadRequestCreateSupervisorWhenFirstNameLessThan3() throws Exception {
 
         // Creating Supervisor object using test values
@@ -239,6 +246,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldBadRequestCreateSupervisorWhenFirstNameBiggerThan256() throws Exception {
 
         // Creating Supervisor object using test values
@@ -263,6 +271,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldBadRequestCreateSupervisorWhenUsernameLengthIsLessThan3() throws Exception {
 
         // Creating Supervisor object using test values
@@ -285,6 +294,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldBadRequestCreateSupervisorWhenUsernameLengthIsBiggerThan256() throws Exception {
 
         // Creating Supervisor object using test values
@@ -310,6 +320,7 @@ public class LearningSupervisorControllerTest {
 
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldBadRequestCreateSupervisorWhenFirstNameIsNull() throws Exception {
 
         // Creating Supervisor object using test values
@@ -332,6 +343,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldBadRequestCreateSupervisorWhenLastNameIsNull() throws Exception {
 
         // Creating Supervisor object using test values
@@ -354,6 +366,7 @@ public class LearningSupervisorControllerTest {
     }
 
     @Test
+    @WithMockUser(username="user",roles={"ADMIN"})
     public void shouldBadRequestCreateSupervisorWhenLastNameIsEmpty() throws Exception {
 
         // Creating Supervisor object using test values

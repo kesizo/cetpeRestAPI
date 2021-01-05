@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,11 +23,13 @@ public class LearningSupervisorController {
     private Logger logger = LoggerFactory.getLogger(LearningSupervisorController.class);
 
     @RequestMapping(value = "/api/cetpe/lsupervisor", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public List<LearningSupervisor> learningSupervisorsIndex(){
         return _learningSupervisorService.getAllLearningSupervisors();
     }
 
     @RequestMapping(value = "/api/cetpe/lsupervisor/{username}", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public LearningSupervisor learningSupervisorsByUsername(@PathVariable String username){
 
         final LearningSupervisor currentSupervisor;
@@ -38,6 +41,7 @@ public class LearningSupervisorController {
 
 
     @PostMapping("/api/cetpe/lsupervisor")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public LearningSupervisor create(@RequestBody Map<String, Object> body) {
 
@@ -63,6 +67,7 @@ public class LearningSupervisorController {
     }
 
     @PutMapping("/api/cetpe/lsupervisor/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public LearningSupervisor update(@PathVariable String username, @RequestBody Map<String, Object> body) {
 
         try {
@@ -86,6 +91,7 @@ public class LearningSupervisorController {
     }
 
     @DeleteMapping("/api/cetpe/lsupervisor/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean delete(@PathVariable String username) {
 
         if (username==null || username.isEmpty() || username.length()<3 || username.length()>256) {

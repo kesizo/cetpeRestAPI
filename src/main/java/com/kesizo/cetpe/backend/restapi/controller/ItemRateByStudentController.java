@@ -2,12 +2,16 @@ package com.kesizo.cetpe.backend.restapi.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kesizo.cetpe.backend.restapi.model.*;
+import com.kesizo.cetpe.backend.restapi.model.ItemRateByStudent;
+import com.kesizo.cetpe.backend.restapi.model.ItemRubric;
+import com.kesizo.cetpe.backend.restapi.model.LearningStudent;
+import com.kesizo.cetpe.backend.restapi.model.UserGroup;
 import com.kesizo.cetpe.backend.restapi.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -46,12 +50,14 @@ public class ItemRateByStudentController {
 
 
     @RequestMapping(value = "/api/cetpe/rate", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<ItemRateByStudent> itemRateAll(){
 
         return _itemRateService.getAllItemRates();
     }
 
     @RequestMapping(value = "/api/cetpe/rate/{id}", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public ItemRateByStudent itemRateById(@PathVariable String id){
 
         try {
@@ -71,6 +77,7 @@ public class ItemRateByStudentController {
 
 
     @GetMapping("/api/cetpe/rates/item/{id_item}")
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public List<ItemRateByStudent> ratesByItemId(@PathVariable String id_item)
     {
         try {
@@ -91,6 +98,7 @@ public class ItemRateByStudentController {
     //http://localhost:8083/api/cetpe/lprocess/rubric/item/student/rate?id_lprocess=1&id_rubric=1
     @GetMapping("/api/cetpe/lprocess/rubric/item/student/rate")
     @ResponseBody
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public List<ItemRateByStudent> ratesByLearningProcessIdAndRubricId(@RequestParam(required = true) String id_lprocess,
                                                                        @RequestParam(required = true) String id_rubric,
                                                                        @RequestParam(required = false) String id_learningSudent)
@@ -142,6 +150,7 @@ public class ItemRateByStudentController {
 
     @PostMapping("/api/cetpe/rate")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ItemRateByStudent create(@RequestBody Map<String, Object> body) {
 
         try {
@@ -241,6 +250,7 @@ public class ItemRateByStudentController {
     }
 
     @PutMapping("/api/cetpe/rate/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ItemRateByStudent update(@PathVariable String id, @RequestBody Map<String, Object> body) {
 
         try {
@@ -336,6 +346,7 @@ public class ItemRateByStudentController {
     }
 
     @DeleteMapping("/api/cetpe/rate/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public boolean delete(@PathVariable String id) {
 
         long itemRateId;

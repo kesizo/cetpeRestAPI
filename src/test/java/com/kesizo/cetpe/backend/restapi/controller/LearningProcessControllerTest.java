@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -40,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 //This annotation tells SpringRunner to configure the MockMvc instance that will be used to make our RESTful calls.
 @ActiveProfiles("test")
+@WithMockUser(username="user",roles={"USER","PM"})
 public class LearningProcessControllerTest {
 
 
@@ -108,6 +110,7 @@ public class LearningProcessControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
     public void shouldStartWithNoneLearningProcess() throws Exception {
 
         MvcResult result = mvc.perform(get(BASE_URL).accept(MediaType.APPLICATION_JSON))
@@ -117,6 +120,19 @@ public class LearningProcessControllerTest {
 
         //Convert JSON Result to object
         LearningProcess[] learningProcesses = this.mapper.readValue(result.getResponse().getContentAsString(), LearningProcess[].class);
+    }
+
+    /**
+     * Should be none learning processes by default
+     *
+     * @throws Exception
+     */
+    @Test
+    public void shouldNotAuthorizedNoneLearningProcess() throws Exception {
+
+        MvcResult result = mvc.perform(get(BASE_URL).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().is4xxClientError())
+                .andReturn();
     }
 
     /**
@@ -150,6 +166,7 @@ public class LearningProcessControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
     public void shouldNotFoundGetLearningProcessByNonExistingID() throws Exception {
 
 
@@ -604,6 +621,7 @@ public class LearningProcessControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="admin",roles={"ADMIN"})
     public void shouldDeleteLearningProcess() throws Exception {
 
         // Creating learning process object using test values

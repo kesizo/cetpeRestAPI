@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 //This annotation tells SpringRunner to configure the MockMvc instance that will be used to make our RESTful calls.
 @ActiveProfiles("test")
+@WithMockUser(username="user",roles={"USER"})
 public class AssessmentRubricControllerTest {
 
 
@@ -119,6 +121,7 @@ public class AssessmentRubricControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldStartWithNoneRubrics() throws Exception {
 
         MvcResult result = mvc.perform(get(BASE_URL).accept(MediaType.APPLICATION_JSON))
@@ -127,7 +130,8 @@ public class AssessmentRubricControllerTest {
                 .andReturn();
 
         //Convert JSON Result to object
-        AssessmentRubric[] assessmentRubrics = this.mapper.readValue(result.getResponse().getContentAsString(), AssessmentRubric[].class);
+        AssessmentRubric[] assessmentRubrics = this.mapper
+                                                .readValue(result.getResponse().getContentAsString(), AssessmentRubric[].class);
     }
 
 
@@ -159,6 +163,7 @@ public class AssessmentRubricControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldCreateAssessmentRubric() throws Exception {
 
         // Creating Rubric object using test values
@@ -191,6 +196,7 @@ public class AssessmentRubricControllerTest {
     }
 
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldCreateAssessmentRubricWithEmptyItemList() throws Exception {
 
         // Creating Rubric object using test values
@@ -223,6 +229,7 @@ public class AssessmentRubricControllerTest {
     }
 
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldCreateAssessmentRubricWithNullItemList() throws Exception {
 
         // Creating Rubric object using test values
@@ -255,6 +262,7 @@ public class AssessmentRubricControllerTest {
     }
 
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldBadRequestCreateAssessmentRubricNullTitle() throws Exception {
 
         // Creating Rubric object using test values
@@ -284,6 +292,7 @@ public class AssessmentRubricControllerTest {
     }
 
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldBadRequestCreateAssessmentRubricEmptyTitle() throws Exception {
 
         // Creating Rubric object using test values
@@ -319,6 +328,7 @@ public class AssessmentRubricControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldUpdateAssessmentRubric() throws Exception {
 
         // Creating Rubric object using test values
@@ -378,6 +388,7 @@ public class AssessmentRubricControllerTest {
      *
      */
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldRetrieveRubricsAssociatedToLearningProcessId() throws Exception {
 
         // Creating Rubric object using test values

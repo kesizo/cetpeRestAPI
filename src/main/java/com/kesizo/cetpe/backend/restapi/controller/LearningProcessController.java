@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -50,12 +51,22 @@ public class LearningProcessController {
 
 
     @RequestMapping(value = "/api/cetpe/lprocess", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<LearningProcess> cetpeLearningProcessIndex(){
 
         return _learningProcessService.getAllLearningProcess();
     }
 
+//    @RequestMapping(value="/id/{domainObjectId}/dostuff", method=RequestMethod.POST, produces="application/json")
+//    @PreAuthorize(value="hasRole('ROLE_DomainObjectAdmin') or @domainObjectServiceImpl.findDomainObject(#domainObjectId).getOwners().contains(#userAccount.getEmployee())")
+//    public String setObjectiveComplete(@PathVariable String domainObjectId, UserAccount userAccount) {
+//      Do stuff
+//    }
+
     @RequestMapping(value = "/api/cetpe/lprocess/{id}", method = RequestMethod.GET)
+//    @PreAuthorize("(hasRole('USER') and @_learningProcessService.getLearningProcessByStudentUsername(authentication.name).contains(@_learningProcessService.cetpeLearningProcessById(#id))) " +
+//            "or hasRole('PM') " +
+//            "or hasRole('ADMIN')")
     public LearningProcess cetpeLearningProcessById(@PathVariable String id){
 
         long learningProcessId;
@@ -77,12 +88,14 @@ public class LearningProcessController {
     }
 
     @GetMapping("/api/cetpe/lprocess/supervisor/{username}")
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public List<LearningProcess> getLearningProcessBySupervisorUsername(@PathVariable String username){
 
         return _learningProcessService.getLearningProcessBySupervisorUsername(username);
     }
 
     @GetMapping("/api/cetpe/lprocess/student/{username}")
+    @PreAuthorize("(hasRole('USER') and authentication.name==#username) or hasRole('PM') or hasRole('ADMIN')")
     public List<LearningProcess> getLearningProcessByStudentUsername(@PathVariable String username){
 
         return _learningProcessService.getLearningProcessByStudentUsername(username);
@@ -99,6 +112,7 @@ public class LearningProcessController {
      */
     @PostMapping("/api/cetpe/lprocess")
     @ResponseStatus(HttpStatus.CREATED) // Otherwise it returns 200 because is the default code for @RestController
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public LearningProcess create(@RequestBody Map<String, Object> body) {
 
         try {
@@ -156,6 +170,7 @@ public class LearningProcessController {
     }
 
     @PutMapping("/api/cetpe/lprocess/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public LearningProcess update(@PathVariable String id, @RequestBody Map<String, Object> body) {
 
         Object supervisor=null;
@@ -232,6 +247,7 @@ public class LearningProcessController {
     }
 
     @PutMapping("/api/cetpe/lprocess/usergroup/add/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public LearningProcess updateAddUserGroup(@PathVariable String id, @RequestBody Map<String, Object> body) {
 
         long learningProcessId = Long.parseLong(id);
@@ -259,6 +275,7 @@ public class LearningProcessController {
     }
 
     @PutMapping("/api/cetpe/lprocess/usergroup/remove/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public LearningProcess updateRemoveUserGroup(@PathVariable String id, @RequestBody Map<String, Object> body) {
 
         long learningProcessId = Long.parseLong(id);
@@ -285,6 +302,7 @@ public class LearningProcessController {
     }
 
     @DeleteMapping("/api/cetpe/lprocess/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public boolean delete(@PathVariable String id) {
 
         long learningProcessId ;

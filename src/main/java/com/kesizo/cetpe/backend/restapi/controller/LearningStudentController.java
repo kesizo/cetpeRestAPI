@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,11 +23,13 @@ public class LearningStudentController {
     private Logger logger = LoggerFactory.getLogger(LearningStudentController.class);
 
     @RequestMapping(value = "/api/cetpe/lstudent", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public List<LearningStudent> learningStudentsIndex(){
         return _learningStudentService.getAllLearningStudents();
     }
 
     @RequestMapping(value = "/api/cetpe/lstudent/{username}", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public LearningStudent learningStudentByUsername(@PathVariable String username){
 
         final LearningStudent currentStudent;
@@ -39,6 +42,7 @@ public class LearningStudentController {
 
     @PostMapping("/api/cetpe/lstudent")
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ADMIN')")
     public LearningStudent create(@RequestBody Map<String, Object> body) {
 
         try {
@@ -64,6 +68,7 @@ public class LearningStudentController {
     }
 
     @PutMapping("/api/cetpe/lstudent/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public LearningStudent update(@PathVariable String username, @RequestBody Map<String, Object> body) {
 
         try {
@@ -88,6 +93,7 @@ public class LearningStudentController {
 
 
     @DeleteMapping("/api/cetpe/lstudent/{username}")
+    @PreAuthorize("hasRole('ADMIN')")
     public boolean delete(@PathVariable String username) {
 
         if (username==null || username.isEmpty() || username.length()<3 || username.length()>256) {

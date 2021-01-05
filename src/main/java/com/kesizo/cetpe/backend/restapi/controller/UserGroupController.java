@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -46,6 +47,7 @@ public class UserGroupController {
 
 
     @RequestMapping(value = "/api/cetpe/group/{id}", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM')or hasRole('ADMIN')")
     public UserGroup userGroupById(@PathVariable String id){
         try{
             long userGroupId = Long.parseLong(id);
@@ -66,6 +68,7 @@ public class UserGroupController {
     //http://localhost:8083/api/cetpe/lprocess/group?id_lprocess=1
     @GetMapping("/api/cetpe/lprocess/group")
     @ResponseBody
+    @PreAuthorize("hasRole('USER') or hasRole('PM')or hasRole('ADMIN')")
     public List<UserGroup> userGroupsByLearningProcessId(@RequestParam(required = false) String id_lprocess)
     {
         List<UserGroup> userGroupList = new ArrayList<>();
@@ -83,6 +86,7 @@ public class UserGroupController {
 
     @PostMapping("/api/cetpe/lprocess/{id}/group")
     @ResponseStatus(HttpStatus.CREATED) // Otherwise it returns 200 because is the default code for @RestController§
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public UserGroup create(@PathVariable String id,@RequestBody Map<String, Object> body) {
 
         try {
@@ -107,6 +111,7 @@ public class UserGroupController {
     }
 
     @PutMapping("/api/cetpe/group/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public UserGroup update(@PathVariable String id, @RequestBody Map<String, Object> body) {
 
         try {
@@ -132,6 +137,7 @@ public class UserGroupController {
     }
 
     @PutMapping("/api/cetpe/group/student/add/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public UserGroup updateAddLearningStudent(@PathVariable String id, @RequestBody Map<String, Object> body) {
 
         try {
@@ -174,6 +180,7 @@ public class UserGroupController {
     }
 
     @PutMapping("/api/cetpe/group/student/remove/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public boolean updateRemoveLearningStudent(@PathVariable String id, @RequestBody Map<String, Object> body) {
         try {
             long userGroupId = Long.parseLong(id);
@@ -218,6 +225,7 @@ public class UserGroupController {
     }
 
     @PutMapping("/api/cetpe/group/authorized/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public UserGroup assignAuthorizedCandidateToUsergroup(@PathVariable String id, @RequestBody Map<String, Object> body) {
         try {
             long userGroupId = Long.parseLong(id);
@@ -250,6 +258,7 @@ public class UserGroupController {
     }
 
     @DeleteMapping("/api/cetpe/group/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public boolean delete(@PathVariable String id) {
 
         try {

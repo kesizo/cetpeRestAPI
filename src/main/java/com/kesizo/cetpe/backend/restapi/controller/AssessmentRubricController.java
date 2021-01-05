@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -42,12 +43,14 @@ public class AssessmentRubricController {
 
 
     @RequestMapping(value = "/api/cetpe/rubric", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AssessmentRubric> assessmentRubricIndex(){
 
         return _assessmentRubricService.getAllAssessmentRubrics();
     }
 
     @RequestMapping(value = "/api/cetpe/rubric/{id}", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public AssessmentRubric assessmentRubricById(@PathVariable String id){
         long assessmentRubricId = 0;
         try {
@@ -67,6 +70,7 @@ public class AssessmentRubricController {
     }
 
     @RequestMapping(value = "/api/cetpe/rubrics/by/lprocess/{id}", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public List<AssessmentRubric> rubricsByLearningProcessId(@PathVariable String id){
 
         long learningProcessId = 0;
@@ -87,6 +91,7 @@ public class AssessmentRubricController {
 
     @PostMapping("/api/cetpe/rubric")
     @ResponseStatus(HttpStatus.CREATED) // Otherwise it returns 200 because is the default code for @RestController
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public AssessmentRubric create(@RequestBody Map<String, Object> body) {
 
         try {
@@ -140,6 +145,7 @@ public class AssessmentRubricController {
     }
 
     @PutMapping("/api/cetpe/rubric/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public AssessmentRubric update(@PathVariable String id, @RequestBody Map<String, Object> body) {
 
         try {
@@ -196,6 +202,7 @@ public class AssessmentRubricController {
     }
 
     @DeleteMapping("/api/cetpe/rubric/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public boolean delete(@PathVariable String id) {
         long assessmentRubricId = Long.parseLong(id);
 

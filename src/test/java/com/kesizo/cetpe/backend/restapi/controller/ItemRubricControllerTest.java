@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 //This annotation tells SpringRunner to configure the MockMvc instance that will be used to make our RESTful calls.
 @ActiveProfiles("test")
+@WithMockUser(username="user",roles={"USER"})
 public class ItemRubricControllerTest {
 
 
@@ -233,6 +235,7 @@ public class ItemRubricControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldCreateItem() throws Exception {
 
         String itemRubricDescription = "Test Item 1 Rubric 1";
@@ -278,7 +281,37 @@ public class ItemRubricControllerTest {
 
     }
 
+    /**
+     * Should create an item on Rubric 1 from lprocess with id=1
+     *
+     * @throws Exception
+     */
     @Test
+    public void shouldForbiddenWhenCreateItemRegularUser() throws Exception {
+
+        String itemRubricDescription = "Test Item 1 Rubric 1";
+
+        ItemRubric itemRubricToCreate = new ItemRubric();
+        itemRubricToCreate.setDescription(itemRubricDescription);
+        itemRubricToCreate.setWeight(ITEM_WEIGHT_TEST);
+        itemRubricToCreate.setAssessmentRubric(getRubricFromTestLearningProcess(LEARNING_PROCESS_TEST_ID));
+        //      itemRubricToCreate.setItemRatesByStudent(null);
+
+        //Creating item JSON
+        byte[] itemRubricToCreateJSON = this.mapper.writeValueAsString(itemRubricToCreate).getBytes();
+
+
+        // CREATE THE ITEM
+        MvcResult resultInsert = mvc.perform(post(BASE_URL) // It doesn't jump to break point and I don't know why
+                .content(itemRubricToCreateJSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldBadRequestCreateItemNullDescription() throws Exception {
 
         // Creating Item object using test values
@@ -305,6 +338,7 @@ public class ItemRubricControllerTest {
 
 
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldBadRequestCreateItemWeightZero() throws Exception {
 
         // Creating Item object using test values
@@ -331,6 +365,7 @@ public class ItemRubricControllerTest {
     }
 
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldBadRequestCreateItemWithAssessmentRubricNull() throws Exception {
 
         // Creating Item object using test values
@@ -361,6 +396,7 @@ public class ItemRubricControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldUpdateItem() throws Exception {
 
         String itemRubricDescription = "Test Item 1 Rubric 1";
@@ -405,6 +441,7 @@ public class ItemRubricControllerTest {
     }
 
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldBadRequestUpdateItemNullDescription() throws Exception {
 
         String itemRubricDescription = "Test Item 1 Rubric 1";
@@ -447,6 +484,7 @@ public class ItemRubricControllerTest {
     }
 
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldBadRequestUpdateItemNullRubric() throws Exception {
 
         String itemRubricDescription = "Test Item 1 Rubric 1";
@@ -492,6 +530,7 @@ public class ItemRubricControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldDeleteItem() throws Exception {
 
         String itemRubricDescription = "Test Item 1 Rubric 1";
@@ -549,6 +588,7 @@ public class ItemRubricControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldNotFoundDeleteItemByBadID() throws Exception {
 
         // Delete: Operation
@@ -580,6 +620,7 @@ public class ItemRubricControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(username="supervisor_admin",roles={"PM","ADMIN"})
     public void shouldReturnFalseDeleteItemByNonExistingID() throws Exception {
 
         String sNonExistingId = String.valueOf(0);

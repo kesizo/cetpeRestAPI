@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,6 +36,7 @@ public class ItemRubricController {
 
 
     @RequestMapping(value = "/api/cetpe/item/{id}", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public ItemRubric itemRubricById(@PathVariable String id) {
 
         try {
@@ -55,6 +57,7 @@ public class ItemRubricController {
     //http://localhost:8083/api/cetpe/item?id_lprocess=1
     @GetMapping("/api/cetpe/item")
     @ResponseBody
+    @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
     public List<ItemRubric> itemRubricByLearningProcessIdOrRubricId(@RequestParam(required = false) String id_lprocess,
                                                                        @RequestParam(required = false) String id_rubric)
     {
@@ -80,6 +83,7 @@ public class ItemRubricController {
     }
 
     @PostMapping("/api/cetpe/item")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public ItemRubric create(@RequestBody Map<String, Object> body) {
 
@@ -125,6 +129,7 @@ public class ItemRubricController {
     }
 
     @PutMapping("/api/cetpe/item/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public ItemRubric update(@PathVariable String id, @RequestBody Map<String,  Object> body) {
 
         try {
@@ -176,6 +181,7 @@ public class ItemRubricController {
 
 
     @DeleteMapping("/api/cetpe/item/{id}")
+    @PreAuthorize("hasRole('PM') or hasRole('ADMIN')")
     public boolean delete(@PathVariable String id) {
 
         long itemRubricId;

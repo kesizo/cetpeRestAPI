@@ -6,6 +6,7 @@ import com.kesizo.cetpe.backend.restapi.service.LearningProcessStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -18,12 +19,13 @@ public class LearningProcessStatusController {
     private LearningProcessStatusService learningProcessStatusService;
 
     @RequestMapping(value = "/api/cetpe/status", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('USER') or hasRole('PM')or hasRole('ADMIN')")
     public List<LearningProcessStatus> cetpeLearningProcessStatusIndex(){
         return learningProcessStatusService.getAllLearningProcessStatus();
     }
 
-    //Operations with the blogs. Retrieve (GET), Update (PUT), Remove (DELETE)
     @GetMapping("/api/cetpe/status/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('PM')or hasRole('ADMIN')")
     public LearningProcessStatus statusTypeById(@PathVariable String id){
 
         long learningProcessStatusId ;

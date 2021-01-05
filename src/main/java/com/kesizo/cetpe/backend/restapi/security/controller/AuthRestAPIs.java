@@ -92,6 +92,10 @@ public class AuthRestAPIs {
                 signUpRequest.getEmail(), encoder.encode(signUpRequest.getPassword()));
 
         Set<String> strRoles = signUpRequest.getRole();
+        if (strRoles==null) {
+            return new ResponseEntity<String>("Fail -> No role is related to the sign up request!",
+                    HttpStatus.BAD_REQUEST);
+        }
         Set<Role> roles = new HashSet<>();
 
         strRoles.forEach(role -> {
