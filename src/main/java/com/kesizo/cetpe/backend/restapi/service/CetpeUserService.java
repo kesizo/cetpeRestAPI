@@ -1,21 +1,21 @@
 package com.kesizo.cetpe.backend.restapi.service;
 
 
-import com.kesizo.cetpe.backend.restapi.model.CetpeUser;
+import com.kesizo.cetpe.backend.restapi.model.CetpeUser_OLD;
 
 import java.util.List;
 
 public interface CetpeUserService {
 
-    CetpeUser getCetpeUserById(long id);
+    CetpeUser_OLD getCetpeUserById(long id);
 
-    List<CetpeUser> getAllCetpeUser();
-
-
-    CetpeUser createCetpeUser(String name, String password);
+    List<CetpeUser_OLD> getAllCetpeUser();
 
 
-    CetpeUser updateCetpeUser(long cetpeUserId, String name, String password);
+    CetpeUser_OLD createCetpeUser(String name, String password);
+
+
+    CetpeUser_OLD updateCetpeUser(long cetpeUserId, String name, String password);
 
     boolean deleteCetpeUser(long cetpeUserId);
 }

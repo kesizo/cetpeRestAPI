@@ -2,7 +2,7 @@ package com.kesizo.cetpe.backend.restapi.security.service;
 
 
 import com.kesizo.cetpe.backend.restapi.security.model.User;
-import com.kesizo.cetpe.backend.restapi.repository.UserRepository;
+import com.kesizo.cetpe.backend.restapi.security.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

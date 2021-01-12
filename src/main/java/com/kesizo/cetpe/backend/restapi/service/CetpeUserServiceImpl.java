@@ -1,7 +1,7 @@
 package com.kesizo.cetpe.backend.restapi.service;
 
 
-import com.kesizo.cetpe.backend.restapi.model.CetpeUser;
+import com.kesizo.cetpe.backend.restapi.model.CetpeUser_OLD;
 import com.kesizo.cetpe.backend.restapi.repository.CetpeUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,18 +16,18 @@ public class CetpeUserServiceImpl implements CetpeUserService {
     private CetpeUserRepository _cetpeUserRepository;
 
     @Override
-    public CetpeUser getCetpeUserById(long id) {
+    public CetpeUser_OLD getCetpeUserById(long id) {
         return this._cetpeUserRepository.getOne(id);
     }
 
     @Override
-    public List<CetpeUser> getAllCetpeUser() {
+    public List<CetpeUser_OLD> getAllCetpeUser() {
         return this._cetpeUserRepository.findAll();
     }
 
     @Override
-    public CetpeUser createCetpeUser(String name, String password) {
-        CetpeUser newCetpeUser = new CetpeUser();
+    public CetpeUser_OLD createCetpeUser(String name, String password) {
+        CetpeUser_OLD newCetpeUser = new CetpeUser_OLD();
         newCetpeUser.setName(name);
         newCetpeUser.setPassword(password);
         newCetpeUser = this._cetpeUserRepository.save(newCetpeUser);
@@ -35,8 +35,8 @@ public class CetpeUserServiceImpl implements CetpeUserService {
     }
 
     @Override
-    public CetpeUser updateCetpeUser(long cetpeUserId, String name, String password) {
-        CetpeUser dpsUpdatable = this._cetpeUserRepository.getOne(cetpeUserId);
+    public CetpeUser_OLD updateCetpeUser(long cetpeUserId, String name, String password) {
+        CetpeUser_OLD dpsUpdatable = this._cetpeUserRepository.getOne(cetpeUserId);
 
         if (dpsUpdatable!=null) {
             dpsUpdatable.setName(name);

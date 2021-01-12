@@ -1,4 +1,4 @@
-package com.kesizo.cetpe.backend.restapi.repository;
+package com.kesizo.cetpe.backend.restapi.security.repository;
 
 import com.kesizo.cetpe.backend.restapi.security.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +15,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByUsername(String username);
 
     Boolean existsByEmail(String email);
+
+    Optional<User> findByEmail(String email);
 }

@@ -60,7 +60,6 @@ public class ItemRateByStudent {
     @JoinColumn(name="targetUserGroup_id", nullable = true) //this can be null
     private UserGroup targetUserGroup;
 
-
     public ItemRateByStudent() {
 
     }

@@ -1,6 +1,6 @@
 package com.kesizo.cetpe.backend.restapi.repository;
 
-import com.kesizo.cetpe.backend.restapi.model.CetpeUser;
+import com.kesizo.cetpe.backend.restapi.model.CetpeUser_OLD;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
  */
 
 @Repository("cetpeUserRepository")
-public interface CetpeUserRepository extends JpaRepository<CetpeUser, Long> {
+public interface CetpeUserRepository extends JpaRepository<CetpeUser_OLD, Long> {
 
 }

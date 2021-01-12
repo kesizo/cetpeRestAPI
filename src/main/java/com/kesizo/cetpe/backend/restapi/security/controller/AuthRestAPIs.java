@@ -1,7 +1,5 @@
 package com.kesizo.cetpe.backend.restapi.security.controller;
 
-import com.kesizo.cetpe.backend.restapi.repository.RoleRepository;
-import com.kesizo.cetpe.backend.restapi.repository.UserRepository;
 import com.kesizo.cetpe.backend.restapi.security.jwt.JwtProvider;
 import com.kesizo.cetpe.backend.restapi.security.message.request.LoginForm;
 import com.kesizo.cetpe.backend.restapi.security.message.request.SignUpForm;
@@ -9,9 +7,13 @@ import com.kesizo.cetpe.backend.restapi.security.message.response.JwtResponse;
 import com.kesizo.cetpe.backend.restapi.security.model.Role;
 import com.kesizo.cetpe.backend.restapi.security.model.RoleName;
 import com.kesizo.cetpe.backend.restapi.security.model.User;
+import com.kesizo.cetpe.backend.restapi.security.repository.RoleRepository;
+import com.kesizo.cetpe.backend.restapi.security.repository.UserRepository;
+import com.kesizo.cetpe.backend.restapi.security.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 
 
 /**
@@ -51,6 +53,9 @@ public class AuthRestAPIs {
     UserRepository userRepository;
 
     @Autowired
+    UserService userService;
+
+    @Autowired
     RoleRepository roleRepository;
 
     @Autowired
@@ -59,8 +64,8 @@ public class AuthRestAPIs {
     @Autowired
     JwtProvider jwtProvider;
 
-    @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
+    @PostMapping("/signin") // it prefixes /api/auth because the class is annotated with @RequestMapping("/api/auth")
+    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -75,7 +80,16 @@ public class AuthRestAPIs {
         return ResponseEntity.ok(new JwtResponse(jwt));
     }
 
-    @PostMapping("/signup")
+    @GetMapping("/roles/{username}") // it prefixes /api/auth because the class is annotated with @RequestMapping("/api/auth")
+    @PreAuthorize("(hasRole('USER') and authentication.name==#username) or hasRole('PM') or hasRole('ADMIN')")
+    public ResponseEntity<Set<String>> getRolesByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getUserRolesByUsername(username)
+                            .stream()
+                            .map(role ->role.getName().toString())
+                            .collect(Collectors.toSet()));
+    }
+
+    @PostMapping("/signup") // it prefixes /api/auth because the class is annotated with @RequestMapping("/api/auth")
     public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpForm signUpRequest) {
         if(userRepository.existsByUsername(signUpRequest.getUsername())) {
             return new ResponseEntity<String>("Fail -> Username is already taken!",

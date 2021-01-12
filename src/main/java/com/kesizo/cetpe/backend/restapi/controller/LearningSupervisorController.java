@@ -41,7 +41,7 @@ public class LearningSupervisorController {
 
 
     @PostMapping("/api/cetpe/lsupervisor")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PM')")
     @ResponseStatus(HttpStatus.CREATED)
     public LearningSupervisor create(@RequestBody Map<String, Object> body) {
 

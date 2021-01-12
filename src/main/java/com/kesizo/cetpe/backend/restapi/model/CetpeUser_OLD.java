@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "cetpe_user")
-public class CetpeUser {
+public class CetpeUser_OLD {
 
     @Id
     private long id;
@@ -26,9 +26,9 @@ public class CetpeUser {
     @Size(min = 8, max = 256) // it requires to have at least 8 characters
     private String password;
 
-    public CetpeUser() { }
+    public CetpeUser_OLD() { }
 
-    public CetpeUser(long id, String name, String password) {
+    public CetpeUser_OLD(long id, String name, String password) {
         this.id = id;
         this.name = name;
         this.password = password;
