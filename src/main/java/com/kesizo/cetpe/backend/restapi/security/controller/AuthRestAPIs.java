@@ -12,6 +12,7 @@ import com.kesizo.cetpe.backend.restapi.security.model.User;
 import com.kesizo.cetpe.backend.restapi.security.repository.RoleRepository;
 import com.kesizo.cetpe.backend.restapi.security.service.UserService;
 import com.kesizo.cetpe.backend.restapi.util.Constants;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -105,7 +106,7 @@ public class AuthRestAPIs {
 
         User userToActivate = userService.getUserByEmail(email).orElse(null);
         if (userToActivate==null) {
-            return new ResponseEntity<>("Fail -> Username to activate DOES NOT exist!",
+            return new ResponseEntity<>("Fail -> Username (email) to activate DOES NOT exist!",
                     HttpStatus.BAD_REQUEST);
         } else {
             if(userToActivate.getActivationCode().equals(code)
@@ -130,15 +131,30 @@ public class AuthRestAPIs {
 
     @PostMapping("/signup") // it prefixes /api/auth because the class is annotated with @RequestMapping("/api/auth")
     public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpForm signUpRequest) {
-        if(userService.checkExistsUserByUsername(signUpRequest.getUsername())) {
+      /*  if(userService.checkExistsUserByUsername(signUpRequest.getUsername())) {
             return new ResponseEntity<String>("Fail -> Username is already taken!",
                     HttpStatus.BAD_REQUEST);
-        }
+        } */
+        
 
         if(userService.checkExistsUserByEmail(signUpRequest.getEmail())) {
-            return new ResponseEntity<String>("Fail -> Email is already in use!",
-                    HttpStatus.BAD_REQUEST);
-        }
+
+            // If the user exists and the user is active... 
+            User userRegister = userService.getUserByEmail(signUpRequest.getEmail()).orElse(null);
+            
+            if (userRegister != null && userRegister.isActive()) { 
+                return new ResponseEntity<String>("Fail -> Email is already in use!",
+                                HttpStatus.BAD_REQUEST);  
+                }
+                else if (userRegister != null && !userRegister.isActive()) {
+
+                    // Resend a new activation key with a new period
+                    userRegister.setPassword(encoder.encode(signUpRequest.getPassword()));
+                    userRegister.setActivationCode(RandomStringUtils.randomAlphanumeric(128));
+                    userRegister.setActivationCodeRequestTimeStamp(LocalDateTime.now());
+                    return getStringResponseEntity(userRegister);
+                }
+            }
 
         // Creating user's account
         User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
@@ -163,7 +179,7 @@ public class AuthRestAPIs {
                     Role pmRole = roleRepository.findByName(RoleName.ROLE_PM)
                             .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
                     roles.add(pmRole);
-
+                    
                     break;
                 default:
                     Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
@@ -175,6 +191,10 @@ public class AuthRestAPIs {
         user.setRoles(roles);
         userService.saveUser(user);
 
+        return getStringResponseEntity(user);
+    }
+
+    private ResponseEntity<String> getStringResponseEntity(User user) {
         //Sending email to the user:
         EmailBody body = new EmailBody();
         body.setEmail(user.getEmail());
@@ -184,12 +204,11 @@ public class AuthRestAPIs {
                                                     .build()
                                                     .toUriString();
 
-        String webLink = baseUrl+"/api/auth/activate?email="+user.getEmail()+"&code="+ user.getActivationCode();
-
+        String webLink = baseUrl+"/api/auth/activate?email="+ user.getEmail()+"&code="+ user.getActivationCode();
 
         body.setContent(Constants.EMAIL_ACTIVATION_CONTENT_START
                  + "<a href="+webLink +">Confirmation</a>"
-                 +"<br/>Click on the link or copy the following url to your browser ("+ webLink + ")<br/>"
+                 +"<br/><br/>Click on the link or copy the following url to your browser ( "+ webLink + " )<br/>"
         +Constants.EMAIL_ACTIVATION_CONTENT_END);
         emailService.sendEmail(body);
 
