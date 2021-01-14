@@ -160,7 +160,7 @@ public class AuthRestAPIControllerTest {
                 .andExpect( jsonPath("$", is("User registered successfully!")))
                 .andReturn();
 
-        currentUser.setUsername("adminName2");
+        currentUser.setEmail("adminName2@email.com");
         adminUserJSON = this.mapper.writeValueAsString(currentUser).getBytes();
 
         mvc.perform(post(BASE_URL+"/signup").content(adminUserJSON)
@@ -200,7 +200,7 @@ public class AuthRestAPIControllerTest {
     public void shouldBadRequestWhenTryingToRegisterWithUserNameNullOrEmpty() throws Exception {
 
         SignUpForm currentUser =  mockSignUpFormAdminUser();
-        currentUser.setUsername(null);
+        currentUser.setEmail(null);
 
         // Creating process JSON
         byte[] adminUserJSON = this.mapper.writeValueAsString(currentUser).getBytes();
@@ -211,7 +211,7 @@ public class AuthRestAPIControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        currentUser.setUsername("");
+        currentUser.setEmail("");
         adminUserJSON = this.mapper.writeValueAsString(currentUser).getBytes();
 
         mvc.perform(post(BASE_URL+"/signup").content(adminUserJSON)
@@ -409,7 +409,6 @@ public class AuthRestAPIControllerTest {
 
         SignUpForm sufUser = new SignUpForm();
         sufUser.setName("adminName");
-        sufUser.setUsername("admin");
         sufUser.setEmail("admin@email.com");
         sufUser.setPassword("adminpassword");
         HashSet<String> roles = new HashSet<>();
@@ -423,7 +422,6 @@ public class AuthRestAPIControllerTest {
 
         SignUpForm sufUser = new SignUpForm();
         sufUser.setName("regularName");
-        sufUser.setUsername("regularUsername");
         sufUser.setEmail("user@email.com");
         sufUser.setPassword("userpassword");
         HashSet<String> roles = new HashSet<>();
@@ -436,7 +434,7 @@ public class AuthRestAPIControllerTest {
     private static LoginForm mockLogInFormRegularUser() {
 
         LoginForm loginUser = new LoginForm();
-        loginUser.setUsername("regularUsername");
+        loginUser.setUsername("user@email.com");
         loginUser.setPassword("userpassword");
         return loginUser;
     }

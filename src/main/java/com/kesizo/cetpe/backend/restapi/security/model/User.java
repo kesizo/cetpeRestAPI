@@ -1,11 +1,13 @@
 package com.kesizo.cetpe.backend.restapi.security.model;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -47,6 +49,13 @@ public class User{
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @Size(max = 128)
+    private String activationCode;
+
+    private LocalDateTime activationCodeRequestTimeStamp;
+
+    private boolean active;
+
     public User() {}
 
     public User(String name, String username, String email, String password) {
@@ -54,6 +63,9 @@ public class User{
         this.username = username;
         this.email = email;
         this.password = password;
+        this.activationCode = RandomStringUtils.randomAlphanumeric(128);
+        this.activationCodeRequestTimeStamp = LocalDateTime.now();
+        this.active=false;
     }
 
     public Long getId() {
@@ -103,4 +115,30 @@ public class User{
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
+
+    public String getActivationCode() {
+        return activationCode;
+    }
+
+    public void setActivationCode(String activationCode) {
+        this.activationCode = activationCode;
+    }
+
+    public LocalDateTime getActivationCodeRequestTimeStamp() {
+        return activationCodeRequestTimeStamp;
+    }
+
+    public void setActivationCodeRequestTimeStamp(LocalDateTime activationCodeRequestTimeStamp) {
+        this.activationCodeRequestTimeStamp = activationCodeRequestTimeStamp;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+
 }

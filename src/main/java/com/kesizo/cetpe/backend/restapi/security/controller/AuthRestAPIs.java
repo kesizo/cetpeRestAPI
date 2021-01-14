@@ -1,5 +1,7 @@
 package com.kesizo.cetpe.backend.restapi.security.controller;
 
+import com.kesizo.cetpe.backend.restapi.email.model.EmailBody;
+import com.kesizo.cetpe.backend.restapi.email.service.EmailService;
 import com.kesizo.cetpe.backend.restapi.security.jwt.JwtProvider;
 import com.kesizo.cetpe.backend.restapi.security.message.request.LoginForm;
 import com.kesizo.cetpe.backend.restapi.security.message.request.SignUpForm;
@@ -8,8 +10,8 @@ import com.kesizo.cetpe.backend.restapi.security.model.Role;
 import com.kesizo.cetpe.backend.restapi.security.model.RoleName;
 import com.kesizo.cetpe.backend.restapi.security.model.User;
 import com.kesizo.cetpe.backend.restapi.security.repository.RoleRepository;
-import com.kesizo.cetpe.backend.restapi.security.repository.UserRepository;
 import com.kesizo.cetpe.backend.restapi.security.service.UserService;
+import com.kesizo.cetpe.backend.restapi.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +22,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,10 +54,10 @@ public class AuthRestAPIs {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    UserRepository userRepository;
+    UserService userService;
 
     @Autowired
-    UserService userService;
+    private EmailService emailService;
 
     @Autowired
     RoleRepository roleRepository;
@@ -89,14 +93,49 @@ public class AuthRestAPIs {
                             .collect(Collectors.toSet()));
     }
 
+    //http://localhost:8083/api/auth/activate?code=mikydoc_sev@hotmail.comjdxyiBfpzNAzh96C46Dz86rn9PibSFATginmp71VfVjIrDIf6mM9Py4yRAaSPr9L
+    @GetMapping("activate")
+    public ResponseEntity<String> activateUser(@RequestParam(required = true) String email,
+                                               @RequestParam(required = true) String code) {
+
+        if (email==null) {
+            return new ResponseEntity<>("Fail -> Email to activate the user is not provided!",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        User userToActivate = userService.getUserByEmail(email).orElse(null);
+        if (userToActivate==null) {
+            return new ResponseEntity<>("Fail -> Username to activate DOES NOT exist!",
+                    HttpStatus.BAD_REQUEST);
+        } else {
+            if(userToActivate.getActivationCode().equals(code)
+                    && userToActivate.getActivationCodeRequestTimeStamp()
+                                     .plusHours(Constants.ACTIVATION_CODE_EXPIRATION_PERIOD_HOURS)
+                                     .isAfter(LocalDateTime.now())) {
+
+                if (userService.activate(userToActivate.getActivationCode(), email)) {
+                    return ResponseEntity.ok().body("Success -> User account has been activated! Go to CEPTE login page to get started.");
+                }
+                else {
+                    return new ResponseEntity<>("Fail -> Error activating user",
+                            HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+            else {
+                return new ResponseEntity<>("Fail -> Activation code IS NOT valid or expired!",
+                        HttpStatus.BAD_REQUEST);
+            }
+        }
+    }
+
     @PostMapping("/signup") // it prefixes /api/auth because the class is annotated with @RequestMapping("/api/auth")
     public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpForm signUpRequest) {
-        if(userRepository.existsByUsername(signUpRequest.getUsername())) {
+        if(userService.checkExistsUserByUsername(signUpRequest.getUsername())) {
             return new ResponseEntity<String>("Fail -> Username is already taken!",
                     HttpStatus.BAD_REQUEST);
         }
 
-        if(userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if(userService.checkExistsUserByEmail(signUpRequest.getEmail())) {
             return new ResponseEntity<String>("Fail -> Email is already in use!",
                     HttpStatus.BAD_REQUEST);
         }
@@ -134,9 +173,29 @@ public class AuthRestAPIs {
         });
 
         user.setRoles(roles);
-        userRepository.save(user);
+        userService.saveUser(user);
 
-        return ResponseEntity.ok().body("User registered successfully!");
+        //Sending email to the user:
+        EmailBody body = new EmailBody();
+        body.setEmail(user.getEmail());
+        body.setSubject(Constants.EMAIL_ACTIVATION_SUBJECT);
+
+        String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                                                    .build()
+                                                    .toUriString();
+
+        String webLink = baseUrl+"/api/auth/activate?email="+user.getEmail()+"&code="+ user.getActivationCode();
+
+
+        body.setContent(Constants.EMAIL_ACTIVATION_CONTENT_START
+                 + "<a href="+webLink +">Confirmation</a>"
+                 +"<br/>Click on the link or copy the following url to your browser ("+ webLink + ")<br/>"
+        +Constants.EMAIL_ACTIVATION_CONTENT_END);
+        emailService.sendEmail(body);
+
+        return ResponseEntity.ok().body("User registered successfully! Activation email sent!");
     }
+
+
 }
 

@@ -1,6 +1,5 @@
 package com.kesizo.cetpe.backend.restapi.security.service;
 
-
 import com.kesizo.cetpe.backend.restapi.security.model.User;
 import com.kesizo.cetpe.backend.restapi.security.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +25,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 
-        User user = userRepository.findByUsername(username)
+       // User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndActive(username, true)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User Not Found with -> username or email : " + username)
+                        new UsernameNotFoundException("Active User Not Found with -> username or email : " + username)
                 );
 
         return UserPrinciple.build(user);
