@@ -22,4 +22,10 @@ public interface UserService {
 
     boolean activate(String activationCode, String email);
 
+    User getUserByResetPasswordToken(String resetPasswordToken);
+
+    boolean updateUserResetPasswordToken(String token, String email);
+
+    boolean updatePassword(User user, String newPassword);
+
 }

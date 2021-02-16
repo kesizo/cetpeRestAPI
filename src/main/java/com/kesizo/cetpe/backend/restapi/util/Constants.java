@@ -2,6 +2,15 @@ package com.kesizo.cetpe.backend.restapi.util;
 
 public final class Constants {
 
+    public static final String EMAIL_FORGOT_PASSWORD_CONTENT_START = "<p>Hello,</p>"
+            + "<p>You have requested to reset your password.</p>"
+            + "<p>Click the link below to change your password:</p>";
+
+    public static final String EMAIL_FORGOT_PASSWORD_CONTENT_END =
+            "<br/>"
+            + "<p>Ignore this email if you do remember your password, "
+            + "or you have not made the request.</p>";
+
     private Constants() {
         // restrict instantiations
     }
@@ -22,6 +31,7 @@ public final class Constants {
 
     public static final int ACTIVATION_CODE_EXPIRATION_PERIOD_HOURS = 24;
     public static final String EMAIL_ACTIVATION_SUBJECT = "CETPE Activation account email";
+    public static final String EMAIL_RESET_PASSWORD_SUBJECT = "CETPE reset password email";
 
 
 }

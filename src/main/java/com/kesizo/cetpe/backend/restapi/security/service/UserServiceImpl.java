@@ -6,13 +6,16 @@ import com.kesizo.cetpe.backend.restapi.security.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
 @Service("UserService")
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -79,6 +82,32 @@ public class UserServiceImpl implements UserService {
             logger.info("User with email {} CANNOT be activated",email);
             return false;
         }
+    }
+
+    @Override
+    public User getUserByResetPasswordToken(String resetPasswordToken) {
+        return _userRepository.findByResetPasswordToken(resetPasswordToken).orElse(null);
+    }
+
+    @Override
+    public boolean updateUserResetPasswordToken(String token, String email) {
+        User user = _userRepository.findByEmail(email).orElse(null);
+        if (user != null) {
+            user.setResetPasswordToken(token);
+            return _userRepository.save(user)!=null;
+        } else {
+            logger.warn("Could not find any user with the email " + email);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean updatePassword(User user, String newPassword) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedPassword);
+        user.setResetPasswordToken(null);
+        return _userRepository.save(user)!=null;
     }
 
 

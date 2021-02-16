@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -55,6 +56,9 @@ public class User{
     private LocalDateTime activationCodeRequestTimeStamp;
 
     private boolean active;
+
+    @Size(max = 128)
+    private String resetPasswordToken;
 
     public User() {}
 
@@ -140,5 +144,25 @@ public class User{
         this.active = active;
     }
 
+    public String getResetPasswordToken() {
+        return resetPasswordToken;
+    }
+
+    public void setResetPasswordToken(String resetPasswordToken) {
+        this.resetPasswordToken = resetPasswordToken;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return active == user.active && id.equals(user.id) && name.equals(user.name) && username.equals(user.username) && email.equals(user.email) && password.equals(user.password) && roles.equals(user.roles) && activationCode.equals(user.activationCode) && activationCodeRequestTimeStamp.equals(user.activationCodeRequestTimeStamp) && resetPasswordToken.equals(user.resetPasswordToken);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, username, email, password, roles, activationCode, activationCodeRequestTimeStamp, active, resetPasswordToken);
+    }
 
 }
