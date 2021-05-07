@@ -25,7 +25,7 @@ INSERT INTO public.users(
 
 INSERT INTO public.users(
 	id, activation_code, activation_code_request_time_stamp, active, email, last_name, name, password, reset_password_token, reset_password_token_request_time_stamp, username)
-	VALUES (2,null, null, true, 'judit.redoli@uah.es','Judith', 'Redoli', '$2a$10$FC19tQiO6v/WNbgyOTf4Z.5HX04n42dBem4WSnX4/Oqo3tkqChYy2', null,null, 'judit.redoli@uah.es ');
+	VALUES (2,null, null, true, 'judit.redoli@uah.es','Judith', 'Redoli', '$2a$10$FC19tQiO6v/WNbgyOTf4Z.5HX04n42dBem4WSnX4/Oqo3tkqChYy2', null,null, 'judit.redoli@uah.es');
 
 	INSERT INTO public.user_roles(
     	user_id, role_id)
