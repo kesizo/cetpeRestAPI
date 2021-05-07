@@ -2,6 +2,7 @@ package com.kesizo.cetpe.backend.restapi.app.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kesizo.cetpe.backend.restapi.app.dto.AssessmentRubricDTO;
 import com.kesizo.cetpe.backend.restapi.app.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.app.model.LearningProcess;
 import com.kesizo.cetpe.backend.restapi.app.model.RubricType;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class AssessmentRubricController {
@@ -71,7 +73,7 @@ public class AssessmentRubricController {
 
     @RequestMapping(value = "/api/cetpe/rubrics/by/lprocess/{id}", method = RequestMethod.GET)
     @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
-    public List<AssessmentRubric> rubricsByLearningProcessId(@PathVariable String id){
+    public List<AssessmentRubricDTO> rubricsByLearningProcessId(@PathVariable String id){
 
         long learningProcessId = 0;
         try {
@@ -86,7 +88,8 @@ public class AssessmentRubricController {
         if (rubricList==null) {
             throw new ResourceNotFoundException("Rubrics associated to learning process with id= " + id + " not found");
         }
-        return rubricList;
+        return rubricList.stream().map(entity-> new AssessmentRubricDTO(entity))
+                                  .collect(Collectors.toList());
     }
 
     @PostMapping("/api/cetpe/rubric")

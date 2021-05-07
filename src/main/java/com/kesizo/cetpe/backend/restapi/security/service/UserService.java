@@ -3,6 +3,7 @@ package com.kesizo.cetpe.backend.restapi.security.service;
 import com.kesizo.cetpe.backend.restapi.security.model.Role;
 import com.kesizo.cetpe.backend.restapi.security.model.User;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -27,5 +28,7 @@ public interface UserService {
     boolean updateUserResetPasswordToken(String token, String email);
 
     boolean updatePassword(User user, String newPassword);
+
+    List<User> getActiveUserList();
 
 }

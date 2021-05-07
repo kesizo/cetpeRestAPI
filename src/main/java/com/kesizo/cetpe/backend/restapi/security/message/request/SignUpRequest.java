@@ -13,10 +13,14 @@ import java.util.Set;
  *     - role
  *     - password
  */
-public class SignUpForm {
+public class SignUpRequest {
     @NotBlank
     @Size(min = 3, max = 50)
     private String name;
+
+    @NotBlank
+    @Size(min = 3, max = 50)
+    private String lastName;
 
     @NotBlank
     @Size(min = 3, max = 50)
@@ -30,8 +34,24 @@ public class SignUpForm {
     private Set<String> role;
 
     @NotBlank
-    @Size(min = 6, max = 40)
+    @Size(min = 8, max = 40)
     private String password;
+
+    public SignUpRequest(){}
+
+    public SignUpRequest(@NotBlank @Size(min = 3, max = 50) String name,
+                         @NotBlank @Size(min = 3, max = 50) String lastName,
+                         @NotBlank @Size(min = 3, max = 50) String username,
+                         @NotBlank @Size(max = 60) @Email String email,
+                         Set<String> role,
+                         @NotBlank @Size(min = 6, max = 40) String password) {
+        this.name = name;
+        this.lastName = lastName;
+        this.username = username;
+        this.email = email;
+        this.role = role;
+        this.password = password;
+    }
 
     public String getName() {
         return name;
@@ -71,5 +91,13 @@ public class SignUpForm {
 
     public void setRole(Set<String> role) {
         this.role = role;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

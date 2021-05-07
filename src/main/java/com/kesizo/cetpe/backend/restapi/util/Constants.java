@@ -30,6 +30,7 @@ public final class Constants {
     public static final boolean RUBRIC_DEFAULT_ENABLED = true;
 
     public static final int ACTIVATION_CODE_EXPIRATION_PERIOD_HOURS = 24;
+    public static final int RESET_PASSWORD_EXPIRATION_PERIOD_HOURS = 2;
     public static final String EMAIL_ACTIVATION_SUBJECT = "CETPE Activation account email";
     public static final String EMAIL_RESET_PASSWORD_SUBJECT = "CETPE reset password email";
 

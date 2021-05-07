@@ -7,7 +7,7 @@ import javax.validation.constraints.Size;
  * 16) Creating the Payload Message that is a POJO containing username & password
  *
  */
-public class LoginForm {
+public class LoginRequest {
     @NotBlank
     @Size(min=3, max = 60)
     private String username;

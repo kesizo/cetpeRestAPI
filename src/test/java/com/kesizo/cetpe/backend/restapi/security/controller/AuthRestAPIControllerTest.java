@@ -1,8 +1,8 @@
 package com.kesizo.cetpe.backend.restapi.security.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kesizo.cetpe.backend.restapi.security.message.request.LoginForm;
-import com.kesizo.cetpe.backend.restapi.security.message.request.SignUpForm;
+import com.kesizo.cetpe.backend.restapi.security.message.request.LoginRequest;
+import com.kesizo.cetpe.backend.restapi.security.message.request.SignUpRequest;
 import com.kesizo.cetpe.backend.restapi.security.message.response.JwtResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -123,7 +123,7 @@ public class AuthRestAPIControllerTest {
     @Test
     public void shouldBadRequestWhenTryingToRegister2UsersWithTheSameUserName() throws Exception {
 
-        SignUpForm currentUser =  mockSignUpFormAdminUser();
+        SignUpRequest currentUser =  mockSignUpFormAdminUser();
         // Creating process JSON
         byte[] adminUserJSON = this.mapper.writeValueAsString(currentUser).getBytes();
 
@@ -149,7 +149,7 @@ public class AuthRestAPIControllerTest {
     @Test
     public void shouldBadRequestWhenTryingToRegister2UsersWithTheSameEmail() throws Exception {
 
-        SignUpForm currentUser =  mockSignUpFormAdminUser();
+        SignUpRequest currentUser =  mockSignUpFormAdminUser();
         // Creating process JSON
         byte[] adminUserJSON = this.mapper.writeValueAsString(currentUser).getBytes();
 
@@ -174,7 +174,7 @@ public class AuthRestAPIControllerTest {
     @Test
     public void shouldBadRequestWhenTryingToRegisterWithEmailNullOrEmpty() throws Exception {
 
-        SignUpForm currentUser =  mockSignUpFormAdminUser();
+        SignUpRequest currentUser =  mockSignUpFormAdminUser();
         currentUser.setEmail(null);
 
         // Creating process JSON
@@ -199,7 +199,7 @@ public class AuthRestAPIControllerTest {
     @Test
     public void shouldBadRequestWhenTryingToRegisterWithUserNameNullOrEmpty() throws Exception {
 
-        SignUpForm currentUser =  mockSignUpFormAdminUser();
+        SignUpRequest currentUser =  mockSignUpFormAdminUser();
         currentUser.setEmail(null);
 
         // Creating process JSON
@@ -224,7 +224,7 @@ public class AuthRestAPIControllerTest {
     @Test
     public void shouldRegisterAsRoleUserWhenTryingToRegisterWithRoleEmpty() throws Exception {
 
-        SignUpForm currentUser =  mockSignUpFormRegularUser();
+        SignUpRequest currentUser =  mockSignUpFormRegularUser();
         currentUser.setRole(new HashSet<>());
 
         // Creating process JSON
@@ -241,7 +241,7 @@ public class AuthRestAPIControllerTest {
     @Test
     public void shouldBadRequestWhenTryingToRegisterWithRoleNull() throws Exception {
 
-        SignUpForm currentUser =  mockSignUpFormRegularUser();
+        SignUpRequest currentUser =  mockSignUpFormRegularUser();
         currentUser.setRole(null);
 
         // Creating process JSON
@@ -358,7 +358,7 @@ public class AuthRestAPIControllerTest {
     @Test
     public void shouldBadRequestWhenTryingToLogInWithUsernameNullOrEmpty() throws Exception {
 
-        LoginForm userToLog = mockLogInFormRegularUser();
+        LoginRequest userToLog = mockLogInFormRegularUser();
         userToLog.setUsername(null);
         byte[] userLoginJSON = this.mapper.writeValueAsString(userToLog).getBytes();
 
@@ -383,7 +383,7 @@ public class AuthRestAPIControllerTest {
     @Test
     public void shouldBadRequestWhenTryingToLogInWithPasswordNullOrEmpty() throws Exception {
 
-        LoginForm userToLog = mockLogInFormRegularUser();
+        LoginRequest userToLog = mockLogInFormRegularUser();
         userToLog.setPassword(null);
         byte[] userLoginJSON = this.mapper.writeValueAsString(userToLog).getBytes();
 
@@ -405,10 +405,11 @@ public class AuthRestAPIControllerTest {
                 .andReturn();
     }
 
-    private static SignUpForm mockSignUpFormAdminUser() {
+    private static SignUpRequest mockSignUpFormAdminUser() {
 
-        SignUpForm sufUser = new SignUpForm();
+        SignUpRequest sufUser = new SignUpRequest();
         sufUser.setName("adminName");
+        sufUser.setLastName("adminFamilyName");
         sufUser.setEmail("admin@email.com");
         sufUser.setPassword("adminpassword");
         HashSet<String> roles = new HashSet<>();
@@ -418,10 +419,11 @@ public class AuthRestAPIControllerTest {
         return sufUser;
     }
 
-    private static SignUpForm mockSignUpFormRegularUser() {
+    private static SignUpRequest mockSignUpFormRegularUser() {
 
-        SignUpForm sufUser = new SignUpForm();
+        SignUpRequest sufUser = new SignUpRequest();
         sufUser.setName("regularName");
+        sufUser.setLastName("regularFamilyName");
         sufUser.setEmail("user@email.com");
         sufUser.setPassword("userpassword");
         HashSet<String> roles = new HashSet<>();
@@ -431,9 +433,9 @@ public class AuthRestAPIControllerTest {
         return sufUser;
     }
 
-    private static LoginForm mockLogInFormRegularUser() {
+    private static LoginRequest mockLogInFormRegularUser() {
 
-        LoginForm loginUser = new LoginForm();
+        LoginRequest loginUser = new LoginRequest();
         loginUser.setUsername("user@email.com");
         loginUser.setPassword("userpassword");
         return loginUser;

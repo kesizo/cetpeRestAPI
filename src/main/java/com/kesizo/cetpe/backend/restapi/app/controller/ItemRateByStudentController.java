@@ -2,6 +2,7 @@ package com.kesizo.cetpe.backend.restapi.app.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kesizo.cetpe.backend.restapi.app.dto.ItemRateByStudentDTO;
 import com.kesizo.cetpe.backend.restapi.app.model.ItemRateByStudent;
 import com.kesizo.cetpe.backend.restapi.app.model.ItemRubric;
 import com.kesizo.cetpe.backend.restapi.app.model.LearningStudent;
@@ -78,10 +79,13 @@ public class ItemRateByStudentController {
 
     @GetMapping("/api/cetpe/rates/item/{id_item}")
     @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
-    public List<ItemRateByStudent> ratesByItemId(@PathVariable String id_item)
+    public List<ItemRateByStudentDTO> ratesByItemId(@PathVariable String id_item)
     {
         try {
-            return _itemRateService.getItemRatesByItemId(Long.parseLong(id_item));
+
+            return _itemRateService.getItemRatesByItemId(Long.parseLong(id_item)).stream()
+                    .map(entity -> new ItemRateByStudentDTO(entity))
+                    .collect(Collectors.toList());
         } catch (NullPointerException np) {
             logger.warn("Error mandatory parameter null provided when getting Rate by ItemID ");
             logger.warn(np.getMessage());
@@ -99,7 +103,7 @@ public class ItemRateByStudentController {
     @GetMapping("/api/cetpe/lprocess/rubric/item/student/rate")
     @ResponseBody
     @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
-    public List<ItemRateByStudent> ratesByLearningProcessIdAndRubricId(@RequestParam(required = true) String id_lprocess,
+    public List<ItemRateByStudentDTO> ratesByLearningProcessIdAndRubricId(@RequestParam(required = true) String id_lprocess,
                                                                        @RequestParam(required = true) String id_rubric,
                                                                        @RequestParam(required = false) String id_learningSudent)
     {
@@ -114,13 +118,13 @@ public class ItemRateByStudentController {
         catch (NumberFormatException nfe) {
             logger.warn("problem retrieving rates, lprocess_id and id_rubric are not valid ids");
             logger.warn(nfe.getMessage());
-            return rateList;
+            return rateList.stream().map(entity -> new ItemRateByStudentDTO(entity)).collect(Collectors.toList());
         }
 
         if (null==id_lprocess || null==id_rubric) {
 
             logger.warn("problem retrieving rates, lprocess_id and id_rubric are null");
-            return rateList;
+            return rateList.stream().map(entity -> new ItemRateByStudentDTO(entity)).collect(Collectors.toList());
         }
         else if (id_learningSudent==null) {
 
@@ -145,7 +149,9 @@ public class ItemRateByStudentController {
             });
         }
 
-        return rateList;
+
+        return rateList.stream().map(entity -> new ItemRateByStudentDTO(entity)).collect(Collectors.toList());
+       // return rateList;
     }
 
     @PostMapping("/api/cetpe/rate")

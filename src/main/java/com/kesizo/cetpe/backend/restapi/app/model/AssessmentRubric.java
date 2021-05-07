@@ -22,7 +22,6 @@ import java.util.Objects;
         scope = AssessmentRubric.class
 )
 public class AssessmentRubric {
-
     //Logger has to be static otherwise it will considered by JPA as column
     private static Logger logger = LoggerFactory.getLogger(AssessmentRubric.class);
 

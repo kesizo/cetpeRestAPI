@@ -80,14 +80,15 @@ public class ItemRateByStudentServiceImpl implements ItemRateByStudentService
             itemRateByStudentUpdatable.setRate(rate);
             itemRateByStudentUpdatable.setLearningStudent(learningStudent);
             itemRateByStudentUpdatable.setItemRubric(itemRubric);
-
             itemRateByStudentUpdatable.setTargetStudent(targetStudent);
             itemRateByStudentUpdatable.setTargetUserGroup(targetUserGroup);
+            itemRateByStudentUpdatable = this._itemRateByStudentRepository.save(itemRateByStudentUpdatable);
         }
         else {
             logger.warn("No itemRateByStudent available with id "+itemRateByStudentId);
             itemRateByStudentUpdatable = null;
         }
+
         return itemRateByStudentUpdatable;
     }
 

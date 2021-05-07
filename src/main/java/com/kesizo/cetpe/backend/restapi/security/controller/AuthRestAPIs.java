@@ -1,11 +1,13 @@
 package com.kesizo.cetpe.backend.restapi.security.controller;
 
+import com.kesizo.cetpe.backend.restapi.app.model.LearningStudent;
 import com.kesizo.cetpe.backend.restapi.email.model.EmailBody;
 import com.kesizo.cetpe.backend.restapi.email.service.EmailService;
 import com.kesizo.cetpe.backend.restapi.security.jwt.JwtProvider;
 import com.kesizo.cetpe.backend.restapi.security.message.request.ForgotPasswordRequest;
-import com.kesizo.cetpe.backend.restapi.security.message.request.LoginForm;
-import com.kesizo.cetpe.backend.restapi.security.message.request.SignUpForm;
+import com.kesizo.cetpe.backend.restapi.security.message.request.LoginRequest;
+import com.kesizo.cetpe.backend.restapi.security.message.request.ResetPasswordRequest;
+import com.kesizo.cetpe.backend.restapi.security.message.request.SignUpRequest;
 import com.kesizo.cetpe.backend.restapi.security.message.response.JwtResponse;
 import com.kesizo.cetpe.backend.restapi.security.model.Role;
 import com.kesizo.cetpe.backend.restapi.security.model.RoleName;
@@ -30,7 +32,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 
@@ -71,12 +75,12 @@ public class AuthRestAPIs {
     @Autowired
     JwtProvider jwtProvider;
 
-    @Value("cepte.app.frontend.domain")
+    @Value("${cepte.app.frontend.domain}")
     String frontEndAppDomain;
 
 
     @PostMapping("/signin") // it prefixes /api/auth because the class is annotated with @RequestMapping("/api/auth")
-    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginForm loginRequest) {
+    public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -99,6 +103,13 @@ public class AuthRestAPIs {
                             .map(role ->role.getName().toString())
                             .collect(Collectors.toSet()));
     }
+
+    @GetMapping("/active/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<User> activeUserList(){
+        return  userService.getActiveUserList();
+    }
+
 
     //http://localhost:8083/api/auth/activate?code=mikydoc_sev@hotmail.comjdxyiBfpzNAzh96C46Dz86rn9PibSFATginmp71VfVjIrDIf6mM9Py4yRAaSPr9L
     @GetMapping("activate")
@@ -136,7 +147,7 @@ public class AuthRestAPIs {
     }
 
     @PostMapping("/signup") // it prefixes /api/auth because the class is annotated with @RequestMapping("/api/auth")
-    public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpForm signUpRequest) {
+    public ResponseEntity<String> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
 
         if(userService.checkExistsUserByEmail(signUpRequest.getEmail())) {
 
@@ -165,7 +176,7 @@ public class AuthRestAPIs {
             }
 
         // Creating user's account
-        User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
+        User user = new User(signUpRequest.getName(), signUpRequest.getLastName(), signUpRequest.getUsername(),
                 signUpRequest.getEmail(), encoder.encode(signUpRequest.getPassword()));
 
         Set<String> strRoles = signUpRequest.getRole();
@@ -214,22 +225,57 @@ public class AuthRestAPIs {
 
         if(userService.checkExistsUserByEmail(forgotPasswordRequest.getEmail())) {
 
-            User userToResetPassword = userService.getUserByEmail(forgotPasswordRequest.getEmail()).get();
-            String resetToken = RandomStringUtils.randomAlphanumeric(128);
-            userToResetPassword.setResetPasswordToken(resetToken);
-            userToResetPassword = userService.saveUser(userToResetPassword);
 
-            if (userToResetPassword!=null && sendResetPasswordEmail(userToResetPassword)) {
+            AtomicBoolean isForgotPasswordRequestSuccess = new AtomicBoolean(false);
+
+            userService.getUserByEmail(forgotPasswordRequest.getEmail()).ifPresent(userToReset -> {
+                userToReset.setResetPasswordToken(RandomStringUtils.randomAlphanumeric(128));
+                userToReset.setResetPasswordTokenRequestTimeStamp(LocalDateTime.now());
+                isForgotPasswordRequestSuccess.set(userService.saveUser(userToReset)!=null && sendResetPasswordEmail(userToReset));
+            });
+
+            if (isForgotPasswordRequestSuccess.get()) {
                 return ResponseEntity.ok().body("Reset Password email sent!");
             }
             else {
-               return new ResponseEntity<>("Operation Failed: Error processing and/or sending reset email password code",
+                return new ResponseEntity<>("Operation Failed: Error processing and/or sending reset email password code",
                         HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         else {
             return new ResponseEntity<>("Operation failed: Email provided does not exist!",
                     HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("reset-password") // it prefixes /api/auth because the class is annotated with @RequestMapping("/api/auth")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+
+        if (resetPasswordRequest==null || resetPasswordRequest.getPasswordResetCode()==null || resetPasswordRequest.getPassword()==null || resetPasswordRequest.getEmail() == null) {
+            return new ResponseEntity<>("Operation Failed: Information to reset password is not provided!",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        AtomicBoolean isResetPasswordRequestSuccess = new AtomicBoolean(false);
+        userService.getUserByEmail(resetPasswordRequest.getEmail()).ifPresent(userToResetPassword -> {
+           if (userToResetPassword.getResetPasswordToken()!=null
+                   && userToResetPassword.getResetPasswordTokenRequestTimeStamp() !=null
+                   && userToResetPassword.getResetPasswordToken().equals(resetPasswordRequest.getPasswordResetCode())
+                   && userToResetPassword.getResetPasswordTokenRequestTimeStamp().plusHours(Constants.RESET_PASSWORD_EXPIRATION_PERIOD_HOURS).isAfter(LocalDateTime.now()))
+           {
+               userToResetPassword.setPassword(encoder.encode(resetPasswordRequest.getPassword()));
+               userToResetPassword.setResetPasswordToken(null);
+               userToResetPassword.setResetPasswordTokenRequestTimeStamp(null);
+
+               isResetPasswordRequestSuccess.set(userService.saveUser(userToResetPassword)!=null);
+           }
+        });
+
+        if (!isResetPasswordRequestSuccess.get()) {
+            return new ResponseEntity<>("Operation Failed: Username (email) to reset password DOES NOT exist or the password period has expired",
+                    HttpStatus.BAD_REQUEST);
+        } else {
+                  return ResponseEntity.ok().body("Success -> User account has updated the password successfully. Go to CEPTE login page to get started.");
         }
     }
 
@@ -267,7 +313,7 @@ public class AuthRestAPIs {
                         "&resetcode="+user.getResetPasswordToken();
 
         body.setContent(Constants.EMAIL_FORGOT_PASSWORD_CONTENT_START
-                + "<p><a href=\"" + webLink + "\">Change my password</a></p>"
+                + "<p><a href=" + webLink + ">Change my password</a></p>"
                 + Constants.EMAIL_FORGOT_PASSWORD_CONTENT_END);
 
         return emailService.sendEmail(body);

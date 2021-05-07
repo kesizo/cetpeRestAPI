@@ -15,6 +15,14 @@ INSERT INTO roles(name) VALUES('ROLE_USER');
 INSERT INTO roles(name) VALUES('ROLE_PM');
 INSERT INTO roles(name) VALUES('ROLE_ADMIN');
 
+INSERT INTO public.users(
+	id, activation_code, activation_code_request_time_stamp, active, email, last_name, name, password, reset_password_token, reset_password_token_request_time_stamp, username)
+	VALUES (1,null, null, true, 'mikydoc_sev@hotmail.com','Doctor', 'Miguel', '$2a$10$FC19tQiO6v/WNbgyOTf4Z.5HX04n42dBem4WSnX4/Oqo3tkqChYy2', null,null, 'mikydoc_sev@hotmail.com');
+
+	INSERT INTO public.user_roles(
+    	user_id, role_id)
+    	VALUES (1, 3);
+
 
 INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent1', 'CRISTIAN', 'PERDIGUERO LOZANO');
 INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent2', 'LAURA', 'PEREA LEÓN');

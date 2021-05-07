@@ -32,6 +32,11 @@ public class User{
 
     @NotBlank
     @Size(min=3, max = 50)
+    private String lastName;
+
+
+    @NotBlank
+    @Size(min=3, max = 50)
     private String username;
 
     @NaturalId
@@ -52,18 +57,19 @@ public class User{
 
     @Size(max = 128)
     private String activationCode;
-
     private LocalDateTime activationCodeRequestTimeStamp;
-
     private boolean active;
 
     @Size(max = 128)
     private String resetPasswordToken;
+    private LocalDateTime resetPasswordTokenRequestTimeStamp;
+
 
     public User() {}
 
-    public User(String name, String username, String email, String password) {
+    public User(String name, String lastName, String username, String email, String password) {
         this.name = name;
+        this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.password = password;
@@ -94,6 +100,14 @@ public class User{
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {
@@ -152,17 +166,24 @@ public class User{
         this.resetPasswordToken = resetPasswordToken;
     }
 
+    public LocalDateTime getResetPasswordTokenRequestTimeStamp() {
+        return resetPasswordTokenRequestTimeStamp;
+    }
+
+    public void setResetPasswordTokenRequestTimeStamp(LocalDateTime resetPasswordTokenRequestTimeStamp) {
+        this.resetPasswordTokenRequestTimeStamp = resetPasswordTokenRequestTimeStamp;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return active == user.active && id.equals(user.id) && name.equals(user.name) && username.equals(user.username) && email.equals(user.email) && password.equals(user.password) && roles.equals(user.roles) && activationCode.equals(user.activationCode) && activationCodeRequestTimeStamp.equals(user.activationCodeRequestTimeStamp) && resetPasswordToken.equals(user.resetPasswordToken);
+        return active == user.active && Objects.equals(id, user.id) && Objects.equals(name, user.name) && Objects.equals(lastName, user.lastName) && Objects.equals(username, user.username) && Objects.equals(email, user.email) && Objects.equals(password, user.password) && Objects.equals(roles, user.roles) && Objects.equals(activationCode, user.activationCode) && Objects.equals(activationCodeRequestTimeStamp, user.activationCodeRequestTimeStamp) && Objects.equals(resetPasswordToken, user.resetPasswordToken) && Objects.equals(resetPasswordTokenRequestTimeStamp, user.resetPasswordTokenRequestTimeStamp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, username, email, password, roles, activationCode, activationCodeRequestTimeStamp, active, resetPasswordToken);
+        return Objects.hash(id, name, lastName, username, email, password, roles, activationCode, activationCodeRequestTimeStamp, active, resetPasswordToken, resetPasswordTokenRequestTimeStamp);
     }
-
 }

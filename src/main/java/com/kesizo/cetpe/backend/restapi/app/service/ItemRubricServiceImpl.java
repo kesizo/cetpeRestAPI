@@ -49,7 +49,9 @@ public class ItemRubricServiceImpl implements ItemRubricService
         List<ItemRubric> itemsRubricFromLearningProcess = new ArrayList<>();
 
         _assessmentRubricRepository.findByLearningProcess_id(lprocessId).forEach(
-                rubric -> itemsRubricFromLearningProcess.addAll(_itemRubricRepository.findByAssessmentRubric_id(rubric.getId()))
+                rubric -> {
+                    _itemRubricRepository.findByAssessmentRubric_id(rubric.getId()).forEach( item -> itemsRubricFromLearningProcess.add(item));
+                }
         );
 
         return itemsRubricFromLearningProcess;

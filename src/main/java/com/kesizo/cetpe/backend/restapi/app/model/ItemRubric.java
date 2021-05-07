@@ -17,8 +17,8 @@ import java.util.Objects;
 @Table(name = "item_rubric")
 @JsonIdentityInfo( //It solves recursive problems with JSON -> https://www.baeldung.com/jackson-bidirectional-relationships-and-infinite-recursion
         generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id",
-        scope = ItemRubric.class // This is needed otherwise if nested JSON objects have the same id it will fails
+        property = "id"//,
+       // scope = ItemRubric.class // This is needed otherwise if nested JSON objects have the same id it will fails
 )
 public class ItemRubric {
 
@@ -41,11 +41,12 @@ public class ItemRubric {
     @Min(1)
     private int weight;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="assessmentRubric_id", nullable=false)
     private AssessmentRubric assessmentRubric;
 
-    @OneToMany(mappedBy = "itemRubric", fetch = FetchType.LAZY)
+//    @OneToMany(mappedBy = "itemRubric", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "itemRubric", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemRateByStudent> itemRatesByStudent; //This is the answer to the items (N:M rel)
 
     public ItemRubric() {

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -74,6 +75,8 @@ public class UserServiceImpl implements UserService {
         User userToActivate = _userRepository.findByActivationCode(activationCode).orElse(null);
         if (userToActivate!=null) {
             userToActivate.setActive(true);
+            userToActivate.setActivationCode(null);
+            userToActivate.setActivationCodeRequestTimeStamp(null);
             _userRepository.save(userToActivate);
             logger.info("User with email {} has been activated",email);
             return true;
@@ -108,6 +111,11 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encodedPassword);
         user.setResetPasswordToken(null);
         return _userRepository.save(user)!=null;
+    }
+
+    @Override
+    public List<User> getActiveUserList() {
+        return _userRepository.findAll();
     }
 
 

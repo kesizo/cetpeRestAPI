@@ -2,6 +2,7 @@ package com.kesizo.cetpe.backend.restapi.app.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kesizo.cetpe.backend.restapi.app.dto.ItemRubricDTO;
 import com.kesizo.cetpe.backend.restapi.app.model.AssessmentRubric;
 import com.kesizo.cetpe.backend.restapi.app.model.ItemRubric;
 import com.kesizo.cetpe.backend.restapi.app.service.AssessmentRubricService;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 public class ItemRubricController {
@@ -58,7 +60,7 @@ public class ItemRubricController {
     @GetMapping("/api/cetpe/item")
     @ResponseBody
     @PreAuthorize("hasRole('USER') or hasRole('PM') or hasRole('ADMIN')")
-    public List<ItemRubric> itemRubricByLearningProcessIdOrRubricId(@RequestParam(required = false) String id_lprocess,
+    public List<ItemRubricDTO> itemRubricByLearningProcessIdOrRubricId(@RequestParam(required = false) String id_lprocess,
                                                                        @RequestParam(required = false) String id_rubric)
     {
         List<ItemRubric> itemList;
@@ -77,9 +79,10 @@ public class ItemRubricController {
         else {
             logger.warn("problem retrieving items, lprocess_id and id_rubric are provided, but only 1 is accepted. lprocess_id will be ignored");
             itemList = _itemRubricService.getItemRubricsByRubricId(Long.parseLong(id_rubric));
-        }
 
-        return itemList;
+        }
+        return itemList.stream().map(entity -> new ItemRubricDTO(entity.getId(),entity.getDescription(), entity.getWeight(), entity.getAssessmentRubric())).collect(Collectors.toList());
+
     }
 
     @PostMapping("/api/cetpe/item")
