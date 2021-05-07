@@ -31,19 +31,17 @@
             <artifactId>spring-boot-starter-data-rest</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql-->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.2.5</version>
-        </dependency>
-
-        <!-- UNIT TEST database https://mvnrepository.com/artifact/org.hsqldb/hsqldb/2.5.0 -->
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.5.0</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- json library: https://mvnrepository.com/artifact/org.json/json-->
@@ -53,12 +51,24 @@
             <version>20190722</version>
         </dependency>
 
-
-
-        <!-- Adding Spring Security dependency <dependency>
+        <!-- Adding Spring Security dependency -->
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>-->
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.10</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.0</version>
+        </dependency>
 
         <!-- SWAGGER to document the api both via JSON and via UI  -->
         <!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger2 -->
@@ -70,8 +80,35 @@
 
         <dependency>
             <groupId>io.springfox</groupId>
+            <artifactId>springfox-core</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-spring-web</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.2</version>
+        </dependency>
+
+        <!-- UNIT TEST database https://mvnrepository.com/artifact/org.hsqldb/hsqldb/2.5.0 -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.5.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Adding Spring Security test dependency -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- Test -->
@@ -86,7 +123,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
     </dependencies>
 
     <properties>

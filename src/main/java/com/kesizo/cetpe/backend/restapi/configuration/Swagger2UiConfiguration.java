@@ -38,6 +38,7 @@ public class Swagger2UiConfiguration extends WebMvcConfigurerAdapter
     }
 
 
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry)
     {
