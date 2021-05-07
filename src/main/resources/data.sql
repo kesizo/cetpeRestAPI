@@ -24,27 +24,27 @@ INSERT INTO public.users(
     	VALUES (1, 3);
 
 
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent1', 'CRISTIAN', 'PERDIGUERO LOZANO');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent2', 'LAURA', 'PEREA LEÓN');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent3', 'JOSÉ MANUEL', 'PÉREZ ROMANA');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent4', 'DIANA', 'TEJERA BERENGUE');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent1', 'CRISTIAN', 'PERDIGUERO LOZANO');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent2', 'LAURA', 'PEREA LEÓN');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent3', 'JOSÉ MANUEL', 'PÉREZ ROMANA');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent4', 'DIANA', 'TEJERA BERENGUE');
 
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent5', 'JUAN JOSÉ', 'FERNÁNDEZ DE VEGA');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent6', 'ISABEL', 'GIL RUIZ');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent7', 'ÁLVARO', 'LÓPEZ MARTÍNEZ');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent8', 'DANIEL', 'NAVARRO ROWLEY');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent5', 'JUAN JOSÉ', 'FERNÁNDEZ DE VEGA');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent6', 'ISABEL', 'GIL RUIZ');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent7', 'ÁLVARO', 'LÓPEZ MARTÍNEZ');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent8', 'DANIEL', 'NAVARRO ROWLEY');
 
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent9', 'ÁLVARO', 'JIMÉNEZ SOTO');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent10', 'GASPAR', 'MARTÍNEZ PIQUERAS');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent11', 'GONZALO', 'RESA ESPINOSA');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent12', 'ANA MARÍA', 'SAIZ GARCÍA');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent9', 'ÁLVARO', 'JIMÉNEZ SOTO');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent10', 'GASPAR', 'MARTÍNEZ PIQUERAS');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent11', 'GONZALO', 'RESA ESPINOSA');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent12', 'ANA MARÍA', 'SAIZ GARCÍA');
 
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent13', 'RAÚL', 'GARCÍA PÉREZ');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent14', 'SERGIO', 'RUIZ BARAJAS');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent15', 'CELIA', 'RUS DELGADO');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent16', 'MARTA', 'SÁEZ OLMEDILLA');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent17', 'IRENE', 'VILLA MURILLO');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent13', 'RAÚL', 'GARCÍA PÉREZ');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent14', 'SERGIO', 'RUIZ BARAJAS');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent15', 'CELIA', 'RUS DELGADO');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent16', 'MARTA', 'SÁEZ OLMEDILLA');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent17', 'IRENE', 'VILLA MURILLO');
 
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent18', 'YUTING', 'CHEN');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent19', 'JORGE', 'MERINO PUERTA');
-INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent20', 'JEAN FERNANDO', 'SELLÁN ARIAS');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent18', 'YUTING', 'CHEN');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent19', 'JORGE', 'MERINO PUERTA');
+--INSERT INTO public.learning_student(username, first_name, last_name) VALUES ('usernameStudent20', 'JEAN FERNANDO', 'SELLÁN ARIAS');
